@@ -1,0 +1,399 @@
+{
+  "scope": "Draft-based smoke evaluation, not verified spoiler accuracy. 24 event paraphrases + 6 general messages.",
+  "source_event_count": 217,
+  "note": "Duplicate IDs listed are acceptable draft alternatives. Original subtitles and first reveal episodes have not been independently verified. General messages produce REVIEW under current code.",
+  "cases": [
+    {
+      "id": "T01",
+      "category": "EVENT_PARAPHRASE",
+      "message": "스테이션 타운십이랑 그 주변 10마일까지 격리됐네.",
+      "watched_episode": 0,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 1,
+      "acceptable_event_ids": [
+        "d1-e101-kb1-f0005",
+        "d1-e101-kb1-f0008"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T02",
+      "category": "EVENT_PARAPHRASE",
+      "message": "해치를 열었을 때 용의자가 러시아어로 소리쳤고 오른손에는 권총이 있었다고 하네.",
+      "watched_episode": 1,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 1,
+      "acceptable_event_ids": [
+        "d1-e101-kb1-f0012"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T03",
+      "category": "EVENT_PARAPHRASE",
+      "message": "캡슐에서 돌이랑 러시아어 비행 매뉴얼처럼 보이는 종이가 나왔네.",
+      "watched_episode": 0,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 1,
+      "acceptable_event_ids": [
+        "d1-e101-kb1-f0016",
+        "d1-e101-kb1-f0017"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T04",
+      "category": "EVENT_PARAPHRASE",
+      "message": "캘거리 외곽에서 찾은 캡슐 조각의 핵 배터리가 방사능 원인으로 지목됐네.",
+      "watched_episode": 1,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 1,
+      "acceptable_event_ids": [
+        "d1-e101-kb1-f0019",
+        "d1-e101-kb1-f0020"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T05",
+      "category": "EVENT_PARAPHRASE",
+      "message": "러시아는 자기네 위성을 잃어버린 적이 없다며 미국이 아는 내용을 물어봤대.",
+      "watched_episode": 1,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 2,
+      "acceptable_event_ids": [
+        "d1-e102-kb1-f0009"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T06",
+      "category": "EVENT_PARAPHRASE",
+      "message": "뉴욕 타임스가 화성 이야기를 입수했지만 믿지 않아서 기사로 내지 않기로 했네.",
+      "watched_episode": 2,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 2,
+      "acceptable_event_ids": [
+        "d1-e102-kb1-f0024",
+        "d1-e102-kb1-f0025",
+        "d1-e102-kb1-f0028"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T07",
+      "category": "EVENT_PARAPHRASE",
+      "message": "앤더턴이 허가 없이 외부에 전화를 해서 기지 밖으로 쫓겨나게 됐네.",
+      "watched_episode": 1,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 2,
+      "acceptable_event_ids": [
+        "d1-e102-kb1-f0037",
+        "d1-e102-kb1-f0038"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T08",
+      "category": "EVENT_PARAPHRASE",
+      "message": "그 소년은 일단 유리라는 이름으로 부르기로 했구나.",
+      "watched_episode": 2,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 2,
+      "acceptable_event_ids": [
+        "d1-e102-kb1-f0040",
+        "d1-e102-kb1-f0042"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T09",
+      "category": "EVENT_PARAPHRASE",
+      "message": "캠벨은 러시아어를 할 줄 알아서 충격 상태인 소년에게 불려갔네.",
+      "watched_episode": 2,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 3,
+      "acceptable_event_ids": [
+        "d1-e103-kb1-f0006"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T10",
+      "category": "EVENT_PARAPHRASE",
+      "message": "제인이 왕과 불새, 막내아들 이반이 나오는 이야기를 들려주네.",
+      "watched_episode": 3,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 3,
+      "acceptable_event_ids": [
+        "d1-e103-kb1-f0010"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T11",
+      "category": "EVENT_PARAPHRASE",
+      "message": "소련 우주 계획 기록을 조사했는데 유인 화성 임무의 단서를 못 찾았대.",
+      "watched_episode": 2,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 3,
+      "acceptable_event_ids": [
+        "d1-e103-kb1-f0018",
+        "d1-e103-kb1-f0020"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T12",
+      "category": "EVENT_PARAPHRASE",
+      "message": "유리의 뼈가 약해진 건 오랫동안 무중력 상태에 있어서 골밀도가 줄었기 때문이라는 주장이 나왔네.",
+      "watched_episode": 3,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 3,
+      "acceptable_event_ids": [
+        "d1-e103-kb1-f0019"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T13",
+      "category": "EVENT_PARAPHRASE",
+      "message": "밀러보다 백악관의 제이콥스에게 먼저 보고하라는 지시가 내려왔네.",
+      "watched_episode": 3,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 4,
+      "acceptable_event_ids": [
+        "d1-e104-kb1-f0013"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T14",
+      "category": "EVENT_PARAPHRASE",
+      "message": "유리에게 영어로 말했더니 이해하는 것처럼 반응한 적이 있다고 하네.",
+      "watched_episode": 4,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 4,
+      "acceptable_event_ids": [
+        "d1-e104-kb1-f0014",
+        "d1-e104-kb1-f0015"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T15",
+      "category": "EVENT_PARAPHRASE",
+      "message": "미국 정부의 공식 입장은 러시아나 구소련 시민을 억류하고 있지 않다는 거네.",
+      "watched_episode": 3,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 4,
+      "acceptable_event_ids": [
+        "d1-e104-kb1-f0022",
+        "d1-e104-kb1-f0023"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T16",
+      "category": "EVENT_PARAPHRASE",
+      "message": "밀러 장관이 물러나고 에릭 매클렐런이 국토안보부 후임 수장으로 정해졌네.",
+      "watched_episode": 4,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 4,
+      "acceptable_event_ids": [
+        "d1-e104-kb1-f0033",
+        "d1-e104-kb1-f0034"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T17",
+      "category": "EVENT_PARAPHRASE",
+      "message": "월저는 알렉세이가 에네르기아 화성 프로그램에서 일했고 십여 년 전 학회에서 만났다고 했네.",
+      "watched_episode": 4,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 5,
+      "acceptable_event_ids": [
+        "d1-e105-kb1-f0006"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T18",
+      "category": "EVENT_PARAPHRASE",
+      "message": "알렉세이 말로는 캡슐이 보내던 텔레메트리를 바이코누르 수신기가 잡았대.",
+      "watched_episode": 5,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 5,
+      "acceptable_event_ids": [
+        "d1-e105-kb1-f0010"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T19",
+      "category": "EVENT_PARAPHRASE",
+      "message": "화이트 울프 엘리트는 러시아 정부 조직이 아니라 민간 보안회사라고 하네.",
+      "watched_episode": 4,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 5,
+      "acceptable_event_ids": [
+        "d1-e105-kb1-f0014"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T20",
+      "category": "EVENT_PARAPHRASE",
+      "message": "화이트 울프가 러시아 우주국에서 남는 로켓이랑 캡슐 같은 장비를 사들였대.",
+      "watched_episode": 5,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 5,
+      "acceptable_event_ids": [
+        "d1-e105-kb1-f0016",
+        "d1-e105-kb1-f0018"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T21",
+      "category": "EVENT_PARAPHRASE",
+      "message": "폭발로 시선을 돌려놓고 그 사이에 소년을 납치해 갔네.",
+      "watched_episode": 5,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 6,
+      "acceptable_event_ids": [
+        "d1-e106-kb1-f0003",
+        "d1-e106-kb1-f0007"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T22",
+      "category": "EVENT_PARAPHRASE",
+      "message": "유리의 간호사 제인이 머리에 총을 맞고 숨진 채 발견됐네.",
+      "watched_episode": 6,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 6,
+      "acceptable_event_ids": [
+        "d1-e106-kb1-f0013"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T23",
+      "category": "EVENT_PARAPHRASE",
+      "message": "소피가 그 비행기에는 아무도 없었고 미끼였다고 밝혔네.",
+      "watched_episode": 5,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "BLURRED",
+      "expected_source_episode": 6,
+      "acceptable_event_ids": [
+        "d1-e106-kb1-f0019"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T24",
+      "category": "EVENT_PARAPHRASE",
+      "message": "위원회는 테일러가 판단을 크게 잘못했지만 범죄는 아니라고 결론 냈네.",
+      "watched_episode": 6,
+      "expected_verdict": "MATCH",
+      "expected_visibility": "VISIBLE",
+      "expected_source_episode": 6,
+      "acceptable_event_ids": [
+        "d1-e106-kb1-f0028",
+        "d1-e106-kb1-f0031"
+      ],
+      "label_status": "DRAFT_BASED_NOT_FIRST_REVEAL_VERIFIED"
+    },
+    {
+      "id": "T25",
+      "category": "GENERAL",
+      "message": "오늘 저녁 뭐 먹을까?",
+      "watched_episode": 2,
+      "expected_verdict": "NO_MATCH",
+      "expected_visibility": "REVIEW",
+      "expected_source_episode": null,
+      "acceptable_event_ids": [],
+      "label_status": "GENERAL_NO_PLOT_CLAIM"
+    },
+    {
+      "id": "T26",
+      "category": "GENERAL",
+      "message": "이 드라마 배경음악이 마음에 들어.",
+      "watched_episode": 2,
+      "expected_verdict": "NO_MATCH",
+      "expected_visibility": "REVIEW",
+      "expected_source_episode": null,
+      "acceptable_event_ids": [],
+      "label_status": "GENERAL_NO_PLOT_CLAIM"
+    },
+    {
+      "id": "T27",
+      "category": "GENERAL",
+      "message": "주말에 시간 맞춰서 같이 볼래?",
+      "watched_episode": 2,
+      "expected_verdict": "NO_MATCH",
+      "expected_visibility": "REVIEW",
+      "expected_source_episode": null,
+      "acceptable_event_ids": [],
+      "label_status": "GENERAL_NO_PLOT_CLAIM"
+    },
+    {
+      "id": "T28",
+      "category": "GENERAL",
+      "message": "재생 화면이 자꾸 끊겨서 인터넷부터 확인해야겠어.",
+      "watched_episode": 2,
+      "expected_verdict": "NO_MATCH",
+      "expected_visibility": "REVIEW",
+      "expected_source_episode": null,
+      "acceptable_event_ids": [],
+      "label_status": "GENERAL_NO_PLOT_CLAIM"
+    },
+    {
+      "id": "T29",
+      "category": "GENERAL",
+      "message": "스포일러 없이 감상평만 말해 줘.",
+      "watched_episode": 2,
+      "expected_verdict": "NO_MATCH",
+      "expected_visibility": "REVIEW",
+      "expected_source_episode": null,
+      "acceptable_event_ids": [],
+      "label_status": "GENERAL_NO_PLOT_CLAIM"
+    },
+    {
+      "id": "T30",
+      "category": "GENERAL",
+      "message": "우주를 배경으로 한 드라마를 원래 좋아해.",
+      "watched_episode": 2,
+      "expected_verdict": "NO_MATCH",
+      "expected_visibility": "REVIEW",
+      "expected_source_episode": null,
+      "acceptable_event_ids": [],
+      "label_status": "GENERAL_NO_PLOT_CLAIM"
+    }
+  ]
+}

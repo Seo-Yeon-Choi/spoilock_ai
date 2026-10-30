@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPOILOCK 영상 분석</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#6b7280; --line:#e3e6eb;
+          --accent:#4f46e5; --ok:#16a34a; --bad:#dc2626; --warn:#d97706; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font: 15px/1.5 system-ui, -apple-system, "Malgun Gothic", sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px; margin-bottom:18px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:12px; }
+  label { display:block; font-size:13px; color:var(--muted); margin-bottom:4px; }
+  input, select { width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:6px; font:inherit; background:#fff; }
+  button { padding:9px 16px; border:0; border-radius:6px; background:var(--accent); color:#fff; font:inherit; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:default; }
+  button.ghost { background:transparent; color:var(--accent); border:1px solid var(--line); padding:5px 10px; font-size:13px; }
+  .row { display:flex; gap:10px; align-items:center; margin-top:14px; flex-wrap:wrap; }
+  .bar { height:8px; background:var(--line); border-radius:4px; overflow:hidden; flex:1; min-width:120px; }
+  .bar > i { display:block; height:100%; background:var(--accent); width:0; transition:width .3s; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:500; font-size:13px; }
+  .st { font-weight:600; font-size:13px; }
+  .st.DONE, .st.SRT_READY { color:var(--ok); } .st.FAILED { color:var(--bad); }
+  .st.TRANSCRIBING, .st.QUEUED, .st.POST_PROCESSING { color:var(--warn); }
+  .err { color:var(--bad); font-size:13px; }
+  .muted { color:var(--muted); font-size:13px; }
+  .table-wrap { overflow-x:auto; }
+</style>
+</head>
+<body>
+<main>
+  <h1>영상 분석 (관리자)</h1>
+  <p class="sub">회차 영상을 올리면 대사를 인식해 SRT 자막을 만듭니다.</p>
+
+  <div class="card">
+    <div class="grid">
+      <div><label>드라마 ID</label><input id="drama" type="number" min="1" value="1"></div>
+      <div><label>회차</label><input id="episode" type="number" min="1" value="1"></div>
+      <div><label>언어</label>
+        <select id="lang"><option value="">자동 감지</option><option value="en">영어</option><option value="ko">한국어</option></select></div>
+      <div><label>관리자 토큰 (설정한 경우)</label><input id="token" type="password" autocomplete="off"></div>
+    </div>
+    <div style="margin-top:12px"><label>영상 파일</label><input id="file" type="file" accept="video/*,audio/*"></div>
+    <div class="row">
+      <button id="upload">업로드 후 분석</button>
+      <div class="bar"><i id="upbar"></i></div>
+      <span id="upmsg" class="muted"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="margin-top:0; justify-content:space-between">
+      <strong>작업 목록</strong><button class="ghost" id="refresh">새로고침</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>회차</th><th>파일</th><th>상태</th><th>진행</th><th>결과</th><th></th></tr></thead>
+        <tbody id="jobs"><tr><td colspan="6" class="muted">불러오는 중…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+try { $("token").value = localStorage.getItem("spoilock_admin_token") || ""; } catch (e) {}
+
+function headers() {
+  const t = $("token").value.trim();
+  try { localStorage.setItem("spoilock_admin_token", t); } catch (e) {}
+  return t ? { "X-Admin-Token": t } : {};
+}
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const LABEL = { QUEUED:"대기", TRANSCRIBING:"대사 인식 중", SRT_READY:"SRT 완료", POST_PROCESSING:"후처리 중", DONE:"완료", FAILED:"실패" };
+
+$("upload").onclick = () => {
+  const f = $("file").files[0];
+  if (!f) { $("upmsg").textContent = "파일을 선택하세요."; return; }
+  const fd = new FormData();
+  fd.append("file", f);
+  fd.append("drama_id", $("drama").value);
+  fd.append("episode", $("episode").value);
+  if ($("lang").value) fd.append("language", $("lang").value);
+
+  const xhr = new XMLHttpRequest();          // 업로드 진행률 표시를 위해 XHR 사용
+  xhr.open("POST", "/admin/videos");
+  for (const [k, v] of Object.entries(headers())) xhr.setRequestHeader(k, v);
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) {
+      const p = e.loaded / e.total * 100;
+      $("upbar").style.width = p + "%";
+      $("upmsg").textContent = `업로드 ${p.toFixed(0)}%`;
+    }
+  };
+  xhr.onload = () => {
+    $("upload").disabled = false;
+    if (xhr.status >= 200 && xhr.status < 300) { $("upmsg").textContent = "업로드 완료, 분석을 시작했습니다."; loadJobs(); }
+    else { let d = xhr.responseText; try { d = JSON.parse(d).detail; } catch (e) {} $("upmsg").textContent = `실패 (${xhr.status}): ${typeof d === "string" ? d : JSON.stringify(d)}`; }
+  };
+  xhr.onerror = () => { $("upload").disabled = false; $("upmsg").textContent = "네트워크 오류"; };
+  $("upload").disabled = true;
+  xhr.send(fd);
+};
+
+async function downloadSrt(id, name) {
+  const r = await fetch(`/admin/videos/${id}/srt`, { headers: headers() });
+  if (!r.ok) return alert("SRT 를 받을 수 없습니다.");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(await r.blob());
+  a.download = name || "subtitle.srt";
+  a.click();
+}
+async function retry(id) {
+  await fetch(`/admin/videos/${id}/retry`, { method: "POST", headers: headers() });
+  loadJobs();
+}
+
+let timer = null;
+async function loadJobs() {
+  clearTimeout(timer);
+  let jobs = [];
+  try {
+    const r = await fetch("/admin/videos", { headers: headers() });
+    if (!r.ok) { $("jobs").innerHTML = `<tr><td colspan="6" class="err">목록 오류 (${r.status})</td></tr>`; return; }
+    jobs = await r.json();
+  } catch (e) { $("jobs").innerHTML = `<tr><td colspan="6" class="err">서버에 연결할 수 없습니다.</td></tr>`; return; }
+
+  $("jobs").innerHTML = jobs.length ? jobs.map(j => {
+    const pct = Math.round((j.progress || 0) * 100);
+    const result = j.segment_count != null
+      ? `대사 ${j.segment_count}줄 · ${Math.round((j.duration_sec || 0) / 60)}분 영상 · ${j.transcribe_sec}s 소요`
+      : "";
+    const actions = [
+      j.srt_file ? `<button class="ghost" data-srt="${esc(j.job_id)}" data-name="${esc(j.srt_file)}">SRT</button>` : "",
+      j.status === "FAILED" ? `<button class="ghost" data-retry="${esc(j.job_id)}">재시도</button>` : "",
+    ].join(" ");
+    return `<tr>
+      <td>${esc(j.drama_id)} / ${esc(j.episode)}화</td>
+      <td>${esc(j.original_name)}<div class="muted">${esc(j.created_at)}</div></td>
+      <td><span class="st ${esc(j.status)}">${esc(LABEL[j.status] || j.status)}</span>
+          ${j.error ? `<div class="err">${esc(j.error)}</div>` : ""}</td>
+      <td style="min-width:110px"><div class="bar"><i style="width:${pct}%"></i></div><span class="muted">${pct}%</span></td>
+      <td class="muted">${esc(result)}</td>
+      <td>${actions}</td></tr>`;
+  }).join("") : `<tr><td colspan="6" class="muted">아직 작업이 없습니다.</td></tr>`;
+
+  document.querySelectorAll("[data-srt]").forEach(b => b.onclick = () => downloadSrt(b.dataset.srt, b.dataset.name));
+  document.querySelectorAll("[data-retry]").forEach(b => b.onclick = () => retry(b.dataset.retry));
+
+  // 진행 중인 작업이 있으면 3초마다 갱신
+  if (jobs.some(j => ["QUEUED", "TRANSCRIBING", "POST_PROCESSING"].includes(j.status))) timer = setTimeout(loadJobs, 3000);
+}
+$("refresh").onclick = loadJobs;
+loadJobs();
+</script>
+</body>
+</html>

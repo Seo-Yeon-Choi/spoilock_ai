@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPOILOCK 판별 테스트</title>
+<style>
+:root{
+  --bg:#f4f5f7; --panel:#ffffff; --line:#e3e5e9; --text:#1c1f24; --muted:#6b7280;
+  --accent:#4f46e5; --accent-soft:#eef0ff; --mine:#4f46e5; --mine-text:#fff;
+  --ok:#16a34a; --ok-soft:#e8f6ed; --lock:#dc2626; --lock-soft:#fdecec;
+  --warn:#d97706; --warn-soft:#fdf3e2; --skip:#0891b2; --skip-soft:#e4f5f8;
+  --code:#f6f7f9;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121417; --panel:#1b1e23; --line:#2b2f36; --text:#e6e8eb; --muted:#9aa1ab;
+    --accent:#8b85ff; --accent-soft:#25244a; --mine:#5b54e8; --mine-text:#fff;
+    --ok:#4ade80; --ok-soft:#163222; --lock:#f87171; --lock-soft:#3a1c1c;
+    --warn:#fbbf24; --warn-soft:#3a2d12; --skip:#22d3ee; --skip-soft:#103239;
+    --code:#15171b;
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);
+  font:14px/1.5 system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+button,select,input,textarea{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto 1fr;height:100vh}
+header{grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+header h1{font-size:15px;margin:0;font-weight:700;letter-spacing:-.2px}
+.status{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.on{background:var(--ok)} .dot.off{background:var(--lock)}
+.stats{margin-left:auto;display:flex;gap:14px;font-size:12px;color:var(--muted)}
+.stats b{color:var(--text);font-weight:600}
+
+main{display:flex;flex-direction:column;min-height:0;min-width:0;border-right:1px solid var(--line)}
+.viewbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;
+  background:var(--panel);border-bottom:1px solid var(--line);font-size:13px}
+.seg{display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:4px 10px;cursor:pointer;border-right:1px solid var(--line);white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button.active{background:var(--accent);color:#fff}
+.viewbar label{color:var(--muted)}
+.viewbar select{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 6px}
+
+.chat{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:14px}
+.empty{margin:auto;text-align:center;color:var(--muted);max-width:340px}
+.msg{align-self:flex-end;max-width:min(560px,85%);display:flex;flex-direction:column;align-items:flex-end;gap:4px;cursor:pointer}
+.bubble{padding:9px 13px;border-radius:14px 14px 4px 14px;background:var(--mine);color:var(--mine-text);
+  white-space:pre-wrap;word-break:break-word;border:2px solid transparent}
+.msg.selected .bubble{border-color:var(--text)}
+.bubble.locked{background:var(--lock-soft);color:var(--lock)}
+.bubble.review{background:var(--warn-soft);color:var(--warn)}
+.bubble.pending{background:var(--panel);color:var(--muted);border:1px dashed var(--line)}
+.bubble .peek{display:block;margin-top:4px;font-size:12px;text-decoration:underline;cursor:pointer;opacity:.8}
+.meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;font-size:11px;color:var(--muted)}
+.pill{padding:1px 8px;border-radius:999px;font-weight:600;font-size:11px}
+.p-ok{background:var(--ok-soft);color:var(--ok)} .p-lock{background:var(--lock-soft);color:var(--lock)}
+.p-warn{background:var(--warn-soft);color:var(--warn)} .p-skip{background:var(--skip-soft);color:var(--skip)}
+.p-wait{background:var(--code);color:var(--muted)}
+.viewers{display:flex;gap:3px}
+.viewers span{width:20px;height:18px;border-radius:4px;font-size:10px;display:grid;place-items:center;font-weight:600}
+.v-ok{background:var(--ok-soft);color:var(--ok)} .v-lock{background:var(--lock-soft);color:var(--lock)}
+.v-warn{background:var(--warn-soft);color:var(--warn)} .v-wait{background:var(--code);color:var(--muted)}
+.spin{width:10px;height:10px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:s .8s linear infinite;display:inline-block}
+@keyframes s{to{transform:rotate(360deg)}}
+
+.composer{background:var(--panel);border-top:1px solid var(--line);padding:10px 16px 12px}
+.presets{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin}
+.presets button{flex:none;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer;white-space:nowrap}
+.presets button:hover{border-color:var(--accent);color:var(--accent)}
+.row{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;resize:none;min-height:42px;max-height:140px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);outline:none}
+textarea:focus{border-color:var(--accent)}
+.send{border:0;background:var(--accent);color:#fff;border-radius:10px;padding:0 18px;height:42px;font-weight:600;cursor:pointer}
+.send:disabled{opacity:.5;cursor:default}
+.opts{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--muted);align-items:center}
+.opts select,.opts input[type=number],.opts input[type=text]{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+.opts input[type=number]{width:54px}
+.opts input[type=text]{width:110px}
+.opts .right{margin-left:auto;display:flex;gap:8px}
+.ghost{border:1px solid var(--line);background:transparent;border-radius:6px;padding:2px 10px;cursor:pointer;font-size:12px}
+
+aside{background:var(--panel);overflow-y:auto;padding:16px;min-height:0}
+aside h2{font-size:13px;margin:0 0 10px;color:var(--muted);font-weight:600}
+.kv{display:grid;grid-template-columns:108px 1fr;gap:6px 10px;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;word-break:break-word}
+.section{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--code);margin:6px 0 4px}
+.bar i{display:block}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:11.5px;overflow:auto;max-height:340px;margin:8px 0 0}
+.note{font-size:12px;color:var(--muted);word-break:break-all}
+.event{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;margin-top:6px}
+
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto;height:auto;min-height:100vh}
+  main{border-right:0;height:72vh}
+  aside{border-top:1px solid var(--line)}
+  .stats{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>🔒 SPOILOCK 판별 테스트</h1>
+    <div class="status"><span class="dot" id="dot"></span><span id="statusText">서버 확인 중…</span></div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <main>
+    <div class="viewbar">
+      <label>누구 화면으로 볼까요?</label>
+      <div class="seg" id="viewerSeg"></div>
+      <label for="noMatchPolicy" style="margin-left:auto">NO_MATCH 처리</label>
+      <select id="noMatchPolicy">
+        <option value="hide">가림 (현재 코드)</option>
+        <option value="show">공개 (정책 대안)</option>
+      </select>
+    </div>
+
+    <div class="chat" id="chat">
+      <div class="empty" id="empty">
+        <p style="font-size:28px;margin:0">💬</p>
+        <p>채팅을 보내면 판별 결과가 여기에 나타나요.<br>메시지를 누르면 오른쪽에 상세 결과가 보여요.</p>
+      </div>
+    </div>
+
+    <div class="composer">
+      <div class="presets" id="presets"></div>
+      <div class="row">
+        <textarea id="input" rows="1" placeholder="채팅 입력 (Enter 전송 · Shift+Enter 줄바꿈)"></textarea>
+        <button class="send" id="send">전송</button>
+      </div>
+      <div class="opts">
+        <label>1차 필터
+          <select id="optMode">
+            <option value="">서버 기본값</option>
+            <option value="on">on</option>
+            <option value="shadow">shadow</option>
+            <option value="off">off</option>
+          </select>
+        </label>
+        <label>top-k <input type="number" id="optTopK" value="20" min="1" max="100"></label>
+        <label>검색 회차 <input type="text" id="optEpisodes" value="1,2,3,4,5,6"></label>
+        <label><input type="checkbox" id="optEvidence" checked> evidence 포함</label>
+        <label>판단 이유
+          <select id="optReason">
+            <option value="full">full</option>
+            <option value="short">short</option>
+            <option value="none">none</option>
+          </select>
+        </label>
+        <label><input type="checkbox" id="optRefresh"> 캐시 무시</label>
+        <div class="right">
+          <button class="ghost" id="exportBtn">CSV 내보내기</button>
+          <button class="ghost" id="clearBtn">기록 지우기</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <aside id="detail">
+    <h2>상세 결과</h2>
+    <p class="note">메시지를 선택하세요.</p>
+  </aside>
+</div>
+
+<script>
+const API = "/judge";
+const PRESETS = [
+  "ㅋㅋㅋㅋㅋ", "안녕하세요~", "몇 화까지 봤어?", "배우 연기 진짜 잘한다", "오늘 저녁 뭐 먹지?",
+  "러시아 측이 오래전에 실종된 우주비행사들을 돌려달라고 요구했네",
+  "캡슐 안에 사람이 있었어", "하늘에서 떨어진 물체 안에 누가 타고 있었음",
+  "ㅋㅋ 결국 형이 범인이었네", "맞아 걔임", "범인 누굴까?"
+];
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch{ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} }
+};
+
+let messages = store.get("spoilock.msgs", []);
+let viewer = store.get("spoilock.viewer", "sender");   // "sender" | number
+let selectedId = null;
+let maxEpisode = 6;
+const peeked = new Set();
+
+// ---------------------------------------------------------------- 판정 → 화면
+function classify(m, watched){
+  // 반환: ok | lock | warn | wait
+  if (m.status === "pending") return "wait";
+  if (m.status === "failed") return "warn";
+  const r = m.res, v = r.analysis_verdict;
+  if (v === "SKIPPED_GENERAL" || v === "SKIPPED_UNRELATED") return "ok";
+  if (v === "MATCH" && r.required_episode_number != null)
+    return watched >= r.required_episode_number ? "ok" : "lock";
+  if (v === "NO_MATCH" && $("noMatchPolicy").value === "show") return "ok";
+  return "warn";   // NO_MATCH(가림 정책) / UNCERTAIN / ERROR → fail-closed
+}
+
+function verdictPill(m){
+  if (m.status === "pending") return `<span class="pill p-wait"><span class="spin"></span> 확인 중</span>`;
+  if (m.status === "failed") return `<span class="pill p-warn">요청 실패</span>`;
+  const r = m.res, v = r.analysis_verdict;
+  const map = {
+    SKIPPED_GENERAL: ["p-skip", "1차 필터 · 일반 대화"],
+    SKIPPED_UNRELATED: ["p-skip", "1차 필터 · 사건 무관"],
+    MATCH: ["p-lock", `스포 · ${r.required_episode_number}화`],
+    NO_MATCH: ["p-ok", "NO_MATCH"],
+    UNCERTAIN: ["p-warn", "UNCERTAIN"],
+    ERROR: ["p-warn", "ERROR"],
+  };
+  const [c, t] = map[v] || ["p-wait", v];
+  let extra = "";
+  if (r.prefilter && r.prefilter.mode === "shadow" && r.prefilter.decision === "SKIP")
+    extra = ` <span class="pill p-skip" title="shadow 모드: 필터는 SKIP 판단, 검사는 수행">shadow SKIP</span>`;
+  return `<span class="pill ${c}">${t}</span>${extra}`;
+}
+
+function bubbleHtml(m){
+  const text = esc(m.text);
+  if (viewer === "sender") return `<div class="bubble${m.status==="pending"?"":""}">${text}</div>`;
+  const k = classify(m, viewer);
+  if (k === "wait") return `<div class="bubble pending"><span class="spin"></span> 스포일러 확인 중…</div>`;
+  if (peeked.has(m.id)) return `<div class="bubble">${text}</div>`;
+  if (k === "lock") return `<div class="bubble locked">🔒 ${m.res.required_episode_number}화 이후 내용이 포함된 메시지예요<span class="peek" data-peek="${m.id}">원문 보기(테스트용)</span></div>`;
+  if (k === "warn") return `<div class="bubble review">⚠️ 스포일러 여부를 확인할 수 없어 가렸어요<span class="peek" data-peek="${m.id}">원문 보기(테스트용)</span></div>`;
+  return `<div class="bubble">${text}</div>`;
+}
+
+function viewersHtml(m){
+  let h = "";
+  for (let ep = 0; ep <= maxEpisode; ep++){
+    const k = classify(m, ep);
+    const sym = k === "ok" ? ep : k === "lock" ? "🔒" : k === "warn" ? "!" : "·";
+    h += `<span class="v-${k}" title="${ep}화까지 본 사람: ${({ok:"원문",lock:"가림",warn:"확인 불가",wait:"확인 중"})[k]}">${sym}</span>`;
+  }
+  return `<span class="viewers">${h}</span>`;
+}
+
+function render(){
+  const chat = $("chat");
+  $("empty").style.display = messages.length ? "none" : "";
+  chat.querySelectorAll(".msg").forEach(e => e.remove());
+  for (const m of messages){
+    const el = document.createElement("div");
+    el.className = "msg" + (m.id === selectedId ? " selected" : "");
+    el.dataset.id = m.id;
+    const ms = m.ms != null ? `${(m.ms/1000).toFixed(2)}s` : "";
+    el.innerHTML = bubbleHtml(m) +
+      `<div class="meta">${verdictPill(m)}${ms ? `<span>${ms}</span>` : ""}</div>` +
+      `<div class="meta"><span>시청자별</span>${viewersHtml(m)}</div>`;
+    chat.appendChild(el);
+  }
+  renderStats();
+  renderDetail();
+}
+
+function renderViewerSeg(){
+  const seg = $("viewerSeg");
+  let h = `<button data-v="sender" class="${viewer==="sender"?"active":""}">보낸 사람</button>`;
+  for (let ep = 0; ep <= maxEpisode; ep++)
+    h += `<button data-v="${ep}" class="${viewer===ep?"active":""}">${ep}화</button>`;
+  seg.innerHTML = h;
+}
+
+function renderStats(){
+  const done = messages.filter(m => m.status === "done");
+  const gem = done.filter(m => m.res.timings_ms && m.res.timings_ms.gemini != null);
+  const skipped = done.filter(m => String(m.res.analysis_verdict).startsWith("SKIPPED"));
+  const shadowSkip = done.filter(m => m.res.prefilter && m.res.prefilter.mode==="shadow" && m.res.prefilter.decision==="SKIP");
+  const times = done.map(m => m.ms);
+  const avg = times.length ? times.reduce((a,b)=>a+b,0)/times.length : 0;
+  const max = times.length ? Math.max(...times) : 0;
+  $("stats").innerHTML =
+    `<span>메시지 <b>${messages.length}</b></span>` +
+    `<span>Gemini 호출 <b>${gem.length}</b></span>` +
+    `<span>필터 생략 <b>${skipped.length}</b>${shadowSkip.length ? ` (+shadow ${shadowSkip.length})` : ""}</span>` +
+    `<span>평균 <b>${(avg/1000).toFixed(2)}s</b> · 최대 <b>${(max/1000).toFixed(2)}s</b></span>`;
+}
+
+function renderDetail(){
+  const box = $("detail");
+  const m = messages.find(x => x.id === selectedId);
+  if (!m){ box.innerHTML = `<h2>상세 결과</h2><p class="note">메시지를 선택하세요.</p>`; return; }
+  if (m.status !== "done"){
+    box.innerHTML = `<h2>상세 결과</h2><p>${esc(m.text)}</p><p class="note">${m.status==="pending"?"판별 중…":esc(m.error||"실패")}</p>`;
+    return;
+  }
+  const r = m.res, pf = r.prefilter || {}, t = r.timings_ms || {};
+  const row = (k, v) => v == null || v === "" ? "" : `<dt>${k}</dt><dd>${v}</dd>`;
+  const stages = [["prefilter","var(--skip)"],["retrieval","var(--accent)"],["gemini","var(--lock)"]];
+  const total = t.total || 1;
+  let bar = "", legend = "";
+  for (const [k, c] of stages) if (t[k] != null){
+    bar += `<i style="width:${Math.max(1, t[k]/total*100)}%;background:${c}"></i>`;
+    legend += `<span><i style="background:${c}"></i>${k} ${t[k]}ms</span>`;
+  }
+  box.innerHTML = `
+    <h2>상세 결과</h2>
+    <p style="margin:0 0 12px;font-weight:600">${esc(m.text)}</p>
+    <dl class="kv">
+      ${row("판정", r.analysis_verdict)}
+      ${row("필요 회차", r.required_episode_number != null ? r.required_episode_number + "화" : "–")}
+      ${row("검토 필요", r.needs_review ? "예 (fail-closed)" : "아니오")}
+      ${row("매칭 사건", r.matched_event_id ? `<code>${esc(r.matched_event_id)}</code>` : null)}
+      ${row("캐시", r.match_cache)}
+      ${row("후보 수", r.candidate_count)}
+      ${row("모델", r.gemini_model)}
+      ${row("오류", r.error ? esc(r.error) : null)}
+    </dl>
+    ${r.matched_event_description ? `<div class="event">📌 ${esc(r.matched_event_description)}</div>` : ""}
+    ${r.reason ? `<div class="section"><h2>Gemini 판단 이유 (관리자용)</h2><div class="note" style="color:var(--text)">${esc(r.reason)}</div></div>` : ""}
+    <div class="section"><h2>1차 필터</h2>
+      ${r.prefilter ? `<dl class="kv">
+        ${row("모드", pf.mode)}
+        ${row("판단", pf.decision)}
+        ${row("단계", pf.stage)}
+        ${row("사유", pf.reason ? esc(pf.reason) : "–")}
+        ${row("최고 유사도", pf.best_sim != null ? pf.best_sim : "–")}
+        ${row("최근접 사건", pf.best_event_id ? `<code>${esc(pf.best_event_id)}</code>` : null)}
+      </dl>` : `<p class="note">꺼짐(off)</p>`}
+    </div>
+    <div class="section"><h2>시간 · 왕복 ${(m.ms/1000).toFixed(2)}s / 서버 ${t.total}ms</h2>
+      <div class="bar">${bar}</div><div class="legend">${legend}</div>
+      ${t.tokens_in != null ? `<p class="note">토큰 입력 ${t.tokens_in} · 출력 ${t.tokens_out}</p>` : ""}
+    </div>
+    <div class="section"><h2>요청 옵션</h2><p class="note">${esc(JSON.stringify(m.req))}</p></div>
+    <details class="section"><summary class="note" style="cursor:pointer">원본 응답 JSON</summary>
+      <pre>${esc(JSON.stringify(r, null, 2))}</pre></details>`;
+}
+
+// ---------------------------------------------------------------- 전송
+async function send(text){
+  text = text.trim();
+  if (!text) return;
+  const episodes = $("optEpisodes").value.split(/[,\s]+/).map(Number).filter(n => Number.isInteger(n) && n > 0);
+  const req = {
+    message: text, debug: true,
+    top_k: Number($("optTopK").value) || 20,
+    include_evidence: $("optEvidence").checked,
+    refresh: $("optRefresh").checked,
+    reason_mode: $("optReason").value,
+  };
+  if (episodes.length) req.episodes = episodes;
+  if ($("optMode").value) req.prefilter_mode = $("optMode").value;
+
+  const m = { id: Date.now() + Math.random().toString(16).slice(2), text, req, status: "pending", at: new Date().toISOString() };
+  messages.push(m);
+  selectedId = m.id;
+  render();
+  scrollBottom();
+
+  const t0 = performance.now();
+  try{
+    const resp = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req) });
+    const body = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(body.detail ? (typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail)) : `HTTP ${resp.status}`);
+    m.res = body; m.status = "done";
+  }catch(e){
+    m.status = "failed"; m.error = String(e.message || e);
+  }
+  m.ms = Math.round(performance.now() - t0);
+  persist();
+  render();
+}
+
+function persist(){ store.set("spoilock.msgs", messages.filter(m => m.status === "done").slice(-300)); }
+function scrollBottom(){ const c = $("chat"); c.scrollTop = c.scrollHeight; }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c]); }
+
+function exportCsv(){
+  const head = ["at","text","verdict","required_episode","needs_review","matched_event_id","prefilter_mode","prefilter_decision","prefilter_stage","best_sim","cache","roundtrip_ms","server_ms","gemini_ms","tokens_in","tokens_out","error"];
+  const q = v => `"${String(v ?? "").replace(/"/g,'""')}"`;
+  const lines = [head.join(",")];
+  for (const m of messages.filter(x => x.status === "done")){
+    const r = m.res, pf = r.prefilter || {}, t = r.timings_ms || {};
+    lines.push([m.at, m.text, r.analysis_verdict, r.required_episode_number, r.needs_review, r.matched_event_id,
+      pf.mode, pf.decision, pf.stage, pf.best_sim, r.match_cache, m.ms, t.total, t.gemini, t.tokens_in, t.tokens_out, r.error].map(q).join(","));
+  }
+  const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `spoilock_test_${new Date().toISOString().slice(0,19).replace(/[:T]/g,"")}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ---------------------------------------------------------------- 이벤트
+const input = $("input");
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229){  // 한글 조합 중 전송 방지
+    e.preventDefault();
+    const v = input.value; input.value = ""; autoGrow(); send(v);
+  }
+});
+input.addEventListener("input", autoGrow);
+function autoGrow(){ input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 140) + "px"; }
+$("send").onclick = () => { const v = input.value; input.value = ""; autoGrow(); send(v); input.focus(); };
+
+$("presets").innerHTML = PRESETS.map(p => `<button title="${esc(p)}">${esc(p.length > 22 ? p.slice(0,22) + "…" : p)}</button>`).join("");
+$("presets").querySelectorAll("button").forEach((b, i) => b.onclick = () => send(PRESETS[i]));
+
+$("viewerSeg").onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  viewer = b.dataset.v === "sender" ? "sender" : Number(b.dataset.v);
+  store.set("spoilock.viewer", viewer);
+  peeked.clear();
+  renderViewerSeg(); render();
+};
+$("noMatchPolicy").onchange = () => { store.set("spoilock.policy", $("noMatchPolicy").value); render(); };
+$("chat").onclick = e => {
+  const p = e.target.closest("[data-peek]");
+  if (p){ peeked.add(p.dataset.peek); render(); return; }
+  const el = e.target.closest(".msg"); if (!el) return;
+  selectedId = el.dataset.id; render();
+};
+$("clearBtn").onclick = () => { if (!messages.length) return; messages = []; selectedId = null; persist(); render(); };
+$("exportBtn").onclick = exportCsv;
+
+// 옵션 기억
+for (const id of ["optMode","optTopK","optEpisodes","optEvidence","optRefresh","optReason"]){
+  const el = $(id), key = "spoilock." + id, saved = store.get(key, null);
+  if (saved != null){ if (el.type === "checkbox") el.checked = saved; else el.value = saved; }
+  el.addEventListener("change", () => store.set(key, el.type === "checkbox" ? el.checked : el.value));
+}
+$("noMatchPolicy").value = store.get("spoilock.policy", "hide");
+$("optEpisodes").addEventListener("change", () => {
+  const eps = $("optEpisodes").value.split(/[,\s]+/).map(Number).filter(n => n > 0);
+  if (eps.length){ maxEpisode = Math.max(...eps); renderViewerSeg(); render(); }
+});
+{ const eps = $("optEpisodes").value.split(/[,\s]+/).map(Number).filter(n => n > 0); if (eps.length) maxEpisode = Math.max(...eps); }
+
+// 서버 상태
+async function health(){
+  try{
+    const r = await fetch("/health"); const h = await r.json();
+    $("dot").className = "dot " + (h.ready ? "on" : "off");
+    $("statusText").textContent = h.ready
+      ? `${h.gemini_model} · 사건 ${h.events}개 · 필터 ${h.prefilter_mode}${h.prefilter_sim_threshold != null ? ` (임계 ${h.prefilter_sim_threshold})` : ""}`
+      : "준비 중";
+  }catch{
+    $("dot").className = "dot off"; $("statusText").textContent = "서버 연결 안 됨";
+  }
+}
+health(); setInterval(health, 15000);
+
+renderViewerSeg();
+render();
+scrollBottom();
+input.focus();
+</script>
+</body>
+</html>

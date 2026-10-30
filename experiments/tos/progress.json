@@ -1,0 +1,246 @@
+{
+  "settings": {
+    "srt": "tears_of_steel_en.srt",
+    "video": "tears_of_steel_720p.mp4",
+    "episode": 1,
+    "batch_size": 6,
+    "overlap": 2,
+    "clip_mode": "api",
+    "resolution": "low",
+    "fps": null
+  },
+  "next_batch": 2,
+  "events": [
+    {
+      "description": "Celia가 로봇 손으로 Thom의 얼굴을 잡고 위협하다가 멈춘다.",
+      "event_type": "MAJOR_EVENT",
+      "fact_status": "DIRECT_EVENT",
+      "evidence_type": "VISUAL",
+      "claimed_evidence_type": "VISUAL",
+      "dialogue_evidence": [],
+      "visual_evidence": [
+        {
+          "timestamp": "00:53",
+          "time_ms": 53000,
+          "description_ko": "Celia가 로봇 손을 들어 Thom의 얼굴 앞에서 위협하듯 가리킨다."
+        }
+      ],
+      "dropped_quotes": 0,
+      "dropped_timestamps": 0,
+      "batch": 1,
+      "segment": [
+        "00:21",
+        "06:35"
+      ]
+    },
+    {
+      "description": "실험실에서 연구원들이 뇌 모형과 컴퓨터를 통해 로봇의 기억을 싱크하고 조작한다.",
+      "event_type": "MAJOR_EVENT",
+      "fact_status": "DIRECT_EVENT",
+      "evidence_type": "BOTH",
+      "claimed_evidence_type": "BOTH",
+      "dialogue_evidence": [
+        {
+          "document_id": "d0-e0-exp-c0001",
+          "quote": "Robot's memory synced and locked!",
+          "time_ms": 23000
+        }
+      ],
+      "visual_evidence": [
+        {
+          "timestamp": "01:11",
+          "time_ms": 71000,
+          "description_ko": "연구원이 기계 장치와 컴퓨터 조작부를 다루고 있다."
+        }
+      ],
+      "dropped_quotes": 0,
+      "dropped_timestamps": 0,
+      "batch": 1,
+      "segment": [
+        "00:21",
+        "06:35"
+      ]
+    },
+    {
+      "description": "Barley가 무전기를 들고 남성에게 준비되었다며 지시한다.",
+      "event_type": "MAJOR_EVENT",
+      "fact_status": "DIRECT_EVENT",
+      "evidence_type": "BOTH",
+      "claimed_evidence_type": "BOTH",
+      "dialogue_evidence": [
+        {
+          "document_id": "d0-e0-exp-c0003",
+          "quote": "Are you ready? Of course you're ready, you're a rockstar.",
+          "time_ms": 191000
+        }
+      ],
+      "visual_evidence": [
+        {
+          "timestamp": "03:37",
+          "time_ms": 217000,
+          "description_ko": "Barley가 무전기를 들고 다른 남성의 어깨를 잡고 있다."
+        }
+      ],
+      "dropped_quotes": 0,
+      "dropped_timestamps": 0,
+      "batch": 1,
+      "segment": [
+        "00:21",
+        "06:35"
+      ]
+    },
+    {
+      "description": "Celia가 로봇 손으로 Thom의 얼굴을 움켜쥐고 위협한다.",
+      "event_type": "MAJOR_EVENT",
+      "fact_status": "DIRECT_EVENT",
+      "evidence_type": "BOTH",
+      "claimed_evidence_type": "BOTH",
+      "dialogue_evidence": [
+        {
+          "document_id": "d0-e0-exp-c0006",
+          "quote": "You broke my heart. I know. You forgot me on earth.",
+          "time_ms": 356000
+        }
+      ],
+      "visual_evidence": [
+        {
+          "timestamp": "06:30",
+          "time_ms": 390000,
+          "description_ko": "Celia의 로봇 손이 Thom의 입 주변을 강하게 잡고 있다."
+        }
+      ],
+      "dropped_quotes": 0,
+      "dropped_timestamps": 0,
+      "batch": 1,
+      "segment": [
+        "00:21",
+        "06:35"
+      ]
+    },
+    {
+      "description": "Thom과 Celia가 과거 로봇 손과 관련된 일로 다투는 연기를 한다.",
+      "event_type": "MAJOR_EVENT",
+      "fact_status": "DIRECT_EVENT",
+      "evidence_type": "BOTH",
+      "claimed_evidence_type": "BOTH",
+      "dialogue_evidence": [
+        {
+          "document_id": "d0-e0-exp-c0005",
+          "quote": "Why don't you just admit that you're freaked out by my robot hand?",
+          "time_ms": 292000
+        }
+      ],
+      "visual_evidence": [
+        {
+          "timestamp": "05:48",
+          "time_ms": 348000,
+          "description_ko": "로봇 손을 가진 여자와 남자가 다투는 듯한 모습"
+        }
+      ],
+      "dropped_quotes": 0,
+      "dropped_timestamps": 0,
+      "batch": 2,
+      "segment": [
+        "04:50",
+        "09:29"
+      ]
+    },
+    {
+      "description": "Thom이 기억 덮어쓰기(Memory overwrite) 작업을 진행하고 조정한다.",
+      "event_type": "MAJOR_EVENT",
+      "fact_status": "DIRECT_EVENT",
+      "evidence_type": "BOTH",
+      "claimed_evidence_type": "BOTH",
+      "dialogue_evidence": [
+        {
+          "document_id": "d0-e0-exp-c0005",
+          "quote": "Memory overwrite in progress!",
+          "time_ms": 292000
+        }
+      ],
+      "visual_evidence": [
+        {
+          "timestamp": "04:57",
+          "time_ms": 297000,
+          "description_ko": "Thom이 장비를 조작하며 모니터에 메모리 오버라이드 진행 바가 표시됨"
+        }
+      ],
+      "dropped_quotes": 0,
+      "dropped_timestamps": 0,
+      "batch": 2,
+      "segment": [
+        "04:50",
+        "09:29"
+      ]
+    },
+    {
+      "description": "세트장에서 로봇과 인물들 간의 전투 촬영 및 폭발 상황이 발생한다.",
+      "event_type": "MAJOR_EVENT",
+      "fact_status": "DIRECT_EVENT",
+      "evidence_type": "BOTH",
+      "claimed_evidence_type": "BOTH",
+      "dialogue_evidence": [
+        {
+          "document_id": "d0-e0-exp-c0007",
+          "quote": "Quiet on set!",
+          "time_ms": 387000
+        }
+      ],
+      "visual_evidence": [
+        {
+          "timestamp": "07:01",
+          "time_ms": 421000,
+          "description_ko": "실내 세트장에서 거대한 폭발이 일어남"
+        }
+      ],
+      "dropped_quotes": 0,
+      "dropped_timestamps": 0,
+      "batch": 2,
+      "segment": [
+        "04:50",
+        "09:29"
+      ]
+    },
+    {
+      "description": "Thom이 기억 덮어쓰기가 완료되었다고 알린다.",
+      "event_type": "MAJOR_EVENT",
+      "fact_status": "DIRECT_EVENT",
+      "evidence_type": "BOTH",
+      "claimed_evidence_type": "BOTH",
+      "dialogue_evidence": [
+        {
+          "document_id": "d0-e0-exp-c0008",
+          "quote": "Memory overwrite complete!",
+          "time_ms": 493000
+        }
+      ],
+      "visual_evidence": [
+        {
+          "timestamp": "08:58",
+          "time_ms": 538000,
+          "description_ko": "모니터에 덮어쓰기 완료 메시지가 뜸"
+        }
+      ],
+      "dropped_quotes": 0,
+      "dropped_timestamps": 0,
+      "batch": 2,
+      "segment": [
+        "04:50",
+        "09:29"
+      ]
+    }
+  ],
+  "rejected": [],
+  "segments": [
+    {
+      "batch": 1,
+      "start": "00:21",
+      "end": "06:35"
+    },
+    {
+      "batch": 2,
+      "start": "04:50",
+      "end": "09:29"
+    }
+  ]
+}

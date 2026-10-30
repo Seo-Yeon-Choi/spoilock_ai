@@ -1,0 +1,32 @@
+# 가상환경
+.venv/
+venv/
+
+# 비밀값
+.env
+.env.*
+!.env.example
+
+# 사건 DB·작업 데이터 (각자 PC에만)
+chroma_data/
+chroma_data_backup*/
+data/
+
+# 원본 미디어
+*.mp4
+*.mkv
+*.mov
+*.wav
+*.mp3
+
+# 모델·캐시
+__pycache__/
+*.pyc
+.pytest_cache/
+.cache/
+models/
+hf_cache/
+
+# 로그
+*.log
+logs/
