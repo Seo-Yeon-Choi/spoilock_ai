@@ -1,0 +1,101 @@
+﻿id,category,message,expected,episode,event_id,source,note
+AI766,D,설립자가 국가의 행보에 불만을 품고 독립된 사병 조직을 만들었던 거구나,SPOILER,5,d1-e105-local-csy-f0017,AI,HARD_LEAK
+AI926,D,대응 없는 비행기 때문에 군용기들이 급하게 움직이는 상황인가 봐.,SPOILER,6,d1-e106-local-csy-f0011,AI,HARD_LEAK
+AI846,D,비밀리에 소년을 다른 곳으로 이송하려는 은밀한 움직임이 포착됐어,SPOILER,5,d1-e105-local-csy-f0033,AI,HARD_LEAK
+AI871,D,곧 있을 공식 석상을 통해 인류 역사상 가장 충격적인 비밀이 세상에 공개될 거야,SPOILER,5,d1-e105-local-csy-f0038,AI,HARD_LEAK
+AI1062,D,과거에 자신의 연구 활동을 되돌아보며 복잡한 심정을 드러내는 장면이었어.,SPOILER,6,d1-e106-local-csy-f0038,AI,HARD_LEAK
+AI856,D,이 기밀 작전의 배후에는 국가 최고 통치 기관의 입김이 작용하고 있었네,SPOILER,5,d1-e105-local-csy-f0035,AI,HARD_LEAK
+AI519,D,일단 방사선 문제 때문에 뭔가 조치를 취하긴 했나 봐,SPOILER,4,d1-e104-local-csy-f0002,AI,HARD_LEAK
+AI681,D,장관 자리 바뀐 거 보니까 드라마 전개가 엄청 빨라졌네,SPOILER,4,d1-e104-local-csy-f0034,AI,HARD_LEAK
+AI1031,D,삭살한 상황 속에서도 애정 전선에는 변화가 있었던 모양이야.,SPOILER,6,d1-e106-local-csy-f0032,AI,HARD_LEAK
+AI991,D,배후에 엄청난 돈을 가진 권력형 인물이 도사리고 있는 것 같더라고.,SPOILER,6,d1-e106-local-csy-f0024,AI,HARD_LEAK
+AI541,D,대사 쪽도 윗선에서 확실하게 힘을 실어준 상태인가 봐,SPOILER,4,d1-e104-local-csy-f0006,AI,HARD_LEAK
+AI514,D,지금 정부 발표를 그대로 믿는 사람이 이상한 거 아니냐?,SPOILER,4,d1-e104-local-csy-f0001,AI,HARD_LEAK
+AI620,C,뻔뻔하게 안 잡았다고 거짓말하는 정부 태도 진짜 짜증 난다,SPOILER,4,d1-e104-local-csy-f0022,AI,HARD_LEAK
+AI865,C,이 엄청난 우주 사기를 세상에 낱낱이 공개하는 기자회견 연다니 너무 기대됨 ㅋㅋㅋ,SPOILER,5,d1-e105-local-csy-f0037,AI,HARD_LEAK
+AI770,C,우주국 불용품을 용병 기업이 샀다는 사실 알게 되는 장면 흥미로웠음 ㅋㅋㅋ,SPOILER,5,d1-e105-local-csy-f0018,AI,HARD_LEAK
+AI560,C,갑자기 화성 소리 나올 때 너무 황당해서 웃음 나옴 ㅋㅋ,SPOILER,4,d1-e104-local-csy-f0010,AI,HARD_LEAK
+AI1030,C,아니 다들 피터지게 싸우는데 테일러는 로맨스 찍고 있었네 ㅋㅋ,SPOILER,6,d1-e106-local-csy-f0032,AI,HARD_LEAK
+AI625,C,눈 하나 깜짝 안 하고 거짓말 공식 입장 발표하는 거 개웃김 ㅋㅋ,SPOILER,4,d1-e104-local-csy-f0023,AI,HARD_LEAK
+AI493,C,캡슐 정체가 도대체 뭔지 알 수 없어서 답답해 죽겠음 ㅋㅋ,SPOILER,3,d1-e103-local-csy-f0020,AI,HARD_LEAK
+AI1076,C,둘이 같이 어디러 가자고 손잡는 모습 왠지 보기 좋네 ㅋㅋ,SPOILER,6,d1-e106-local-csy-f0041,AI,HARD_LEAK
+AI538,B,대사가 에릭에게 자신이 대통령과 밀러 장관의 전권을 위임받은 밀러의 대변인이라고 확실히 말함,SPOILER,4,d1-e104-local-csy-f0006,AI,HARD_LEAK
+AI1084,B,다시는 이 일에 손을 대지 말라는 엄격한 단서 조건이 붙었어.,SPOILER,6,d1-e106-local-csy-f0043,AI,HARD_LEAK
+AI451,B,식당 와서 커피 찾고 소비에트 우주 역사 파고 있다고 함,SPOILER,3,d1-e103-local-csy-f0012,AI,PREFILTER_SKIP
+AI454,D,식당에서 커피 마시며 옛날 우주 계획 자료를 파고 있더라,SPOILER,3,d1-e103-local-csy-f0012,AI,PREFILTER_SKIP
+AI453,C,커피 찾으러 와서 옛날 우주 역사 조사하는 거 은근 웃기네 ㅋㅋ,SPOILER,3,d1-e103-local-csy-f0012,AI,PREFILTER_SKIP
+AI265,E2,지구의 누군가를 추적하거나 타격하려고 일부러 궤도를 저렇게 잡은 거 아닐까?,SAFE,2,d1-e102-local-csy-f0017,AI,UNSTABLE
+AI479,D,지구 사람이 아니라는 결정적인 증거가 제시되네,SPOILER,3,d1-e103-local-csy-f0017,AI,UNSTABLE
+AI069,D,의사 소견으로는 아이가 한동안 못 먹었지만 회복 중이라네,SPOILER,1,d1-e101-local-csy-f0014,AI,UNSTABLE
+AI850,C,소피한테 이송 작전 몰래 털어놓는 거 은근 긴장감  쫄깃했음 ㄷㄷ,SPOILER,5,d1-e105-local-csy-f0034,AI,UNSTABLE
+AI1080,B,포기하지 말고 그 사람을 끝까지 추적해야 한다고 말하네.,SPOILER,6,d1-e106-local-csy-f0042,AI,UNSTABLE
+AI096,B,방사능의 근원인 핵 배터리가 장착된 캡슐 조각이 캘거리 밖에서 회수됨,SPOILER,1,d1-e101-local-csy-f0020,AI,ERROR_ID
+AI127,B,과거 소련 방공군이었던 페트로프와 83년 모스크바 벙커 사건이 언급됨,SPOILER,1,d1-e101-local-csy-f0026,AI,ERROR_ID
+AI276,B,외계인이 입을 열지 논의하는 도중에 면역체계가 망가져서 반응을 보인다고 언급됨.,SPOILER,2,d1-e102-local-csy-f0020,AI,ERROR_ID
+AI634,B,화성 탐사 대가가 왜 이번 수사에 끼어있는지 러시아 대사가 질문을 던짐,SPOILER,4,d1-e104-local-csy-f0025,AI,ERROR_ID
+AI084,D,요원들이 캡슐 안을 뒤져서 특이한 증거품들을 수거해 갔나 봄,SPOILER,1,d1-e101-local-csy-f0017,AI,OVERBLOCK
+AI173,C,스펙 보니까 진짜 엄청난 엘리트 과학자네 대단하다,SPOILER,1,d1-e101-local-csy-f0035,AI,OVERBLOCK
+AI286,B,의사가 소년의 면역체계가 손상되어 어딘가에 반응하는 중이라고 밝힘.,SPOILER,2,d1-e102-local-csy-f0022,AI,OVERBLOCK
+AI645,C,물 샘플 채취해서 성분 분석하는 과학자들 모습 넘 멋지더라,SPOILER,4,d1-e104-local-csy-f0027,AI,OVERBLOCK
+AI013,C,비행기가 하늘에서 그냥 터져버렸다고 하니까 너무 충격적이야,SPOILER,1,d1-e101-local-csy-f0003,AI,OVERBLOCK
+AI464,D,자기가 왜 여기에 오게 됐는지 이력과 사연을 털어놓더라,SPOILER,3,d1-e103-local-csy-f0014,AI,OVERBLOCK
+AI450,E2,나중에 그림이 완성되면 진짜 결말을 들을 수 있겠지?,SAFE,3,d1-e103-local-csy-f0011,AI,E2_HIDDEN
+AI977,E2,정부 공식 작전은 아니라면서 뒤로는 민간 보안회사 시킨 거 아닐까?,SAFE,6,d1-e106-local-csy-f0021,AI,E2_HIDDEN
+AI562,E2,진짜로 화성 탐사 다녀온 우주인들이 타고 있었던 거 아닐까?,SAFE,4,d1-e104-local-csy-f0010,AI,E2_HIDDEN
+AI370,E2,저러다 앤더튼이 비밀 요원들에게 감금되거나 입막음당하는 거 아니야?,SAFE,2,d1-e102-local-csy-f0038,AI,E2_SHOWN
+AI390,E2,나중에 소년이 기억을 찾거나 말을 하게 되면 진짜 이름을 알 수 있겠지?,SAFE,2,d1-e102-local-csy-f0042,AI,E2_SHOWN
+AI997,E2,그 화성 전문가를 통해서 캡슐의 정체를 미리 알고 있었던 거 아닐까?,SAFE,6,d1-e106-local-csy-f0025,AI,E2_SHOWN
+AI974,B,이번 사건과 러시아 정부는 아무런 공식적 연관이 없다고 대사가 주장했지.,SPOILER,6,d1-e106-local-csy-f0021,AI,REGRESSION
+AI427,B,라이카라는 강아지랑 본인 사연을 의사가 털어놓음,SPOILER,3,d1-e103-local-csy-f0007,AI,REGRESSION
+AI042,B,에드먼턴 바깥쪽 숲속에 항공기 잔해로 보이는 물체가 추락했어,SPOILER,1,d1-e101-local-csy-f0009,AI,REGRESSION
+AI466,B,제인이 침대 가드에 부딪혀서 유리 뼈가 부러졌다고 말함,SPOILER,3,d1-e103-local-csy-f0015,AI,REGRESSION
+AI011,B,테일러가 몬태나 상공에서 여객기 터졌다고 보고함,SPOILER,1,d1-e101-local-csy-f0003,AI,REGRESSION
+AI648,B,박사가 유리 캡슐 재활용 물을 분석해서 화성 표면 흔적 성분이 있는지 조사 중이라고 함,SPOILER,4,d1-e104-local-csy-f0028,AI,REGRESSION
+AI553,B,인공위성에 우주비행사들이 타고 있었고 오래전에 실종됐었다고 대사가 러시아 대사한테 말함,SPOILER,4,d1-e104-local-csy-f0009,AI,REGRESSION
+AI933,B,유리의 간호사인 제인이 머리에 총을 맞고 숨진 채로 발견됐어.,SPOILER,6,d1-e106-local-csy-f0013,AI,REGRESSION
+AI103,C,아이가 온몸에 암이 퍼졌다니 너무 불쌍해서 눈물 난다,SPOILER,1,d1-e101-local-csy-f0021,AI,REGRESSION
+AI1046,C,믿었던 사람한테 뒤통수 맞아서 저런 상황에 빠진 거라니 너무 슬프다...,SPOILER,6,d1-e106-local-csy-f0035,AI,REGRESSION
+AI373,C,클라이브가 유출자였다는 사실이 밝혀졌을 때 진짜 뒤통수 맞은 기분이었어.,SPOILER,2,d1-e102-local-csy-f0039,AI,REGRESSION
+AI243,C,소행성 추적가라고 자기 소개하는 클라이브 모습 왠지 믿음직스러웠어.,SPOILER,2,d1-e102-local-csy-f0013,AI,REGRESSION
+AI965,C,텅 빈 비행기로 미끼 작전 벌인 거였다니 진짜 소름 돋는다 ㄷㄷ,SPOILER,6,d1-e106-local-csy-f0019,AI,REGRESSION
+AI990,C,정부 하수인 노릇 하는 엄청난 부자 올리고르크라니 캐릭터 살벌하다...,SPOILER,6,d1-e106-local-csy-f0024,AI,REGRESSION
+AI546,D,그 떨어진 물건이 옛날 소련 부품 같은 건가 봐,SPOILER,4,d1-e104-local-csy-f0007,AI,REGRESSION
+AI696,D,기지 주변을 감시하던 누군가가 결국 보안팀에 덜미를 잡힌 모양이야,SPOILER,5,d1-e105-local-csy-f0003,AI,REGRESSION
+AI119,D,윗선에서 의사의 경고를 무시하고 강행하려는 움직임이 보이네,SPOILER,1,d1-e101-local-csy-f0024,AI,REGRESSION
+AI374,D,믿었던 동료가 알고 보니 내부 정보를 바깥으로 빼돌린 주범이었네.,SPOILER,2,d1-e102-local-csy-f0039,AI,REGRESSION
+AI294,D,소년의 검진 결과를 보니 방사선 피폭 흔적과 암이 너무 심각하네.,SPOILER,2,d1-e102-local-csy-f0023,AI,REGRESSION
+AI831,D,착륙 과정에서 시스템 고장이나 예기치 못한 사고가 있었던 것 같아,SPOILER,5,d1-e105-local-csy-f0030,AI,REGRESSION
+AI1117,F,진짜 몰입해서 보다 보니까 시간 가는 줄 몰랐네,SAFE,,,AI,SAFE_AI
+AI1097,F,이번 회차 엔딩 진짜 심장 떨려서 죽는 줄 알았음 ㅋㅋ,SAFE,,,AI,SAFE_AI
+AI1093,F,와 음악 깔릴 때마다 소름 돋는다 ㄷㄷ,SAFE,,,AI,SAFE_AI
+AI1113,F,와 대사 하나하나가 진짜 주옥같다 ㅋㅋㅋ,SAFE,,,AI,SAFE_AI
+AI1089,F,이번 화 진짜 미쳤다 ㅋㅋㅋ 연기력 소름돋네,SAFE,,,AI,SAFE_AI
+AI1118,G,다들 다음 화 예고편 벌써 봤음? 나만 안 봤나,SAFE,,,AI,SAFE_AI
+AI1098,G,다음 화는 언제 올라오는지 아는 사람?,SAFE,,,AI,SAFE_AI
+AI1094,G,다들 오늘 야식 뭐 먹으면서 보는 중?,SAFE,,,AI,SAFE_AI
+AI1114,G,다들 OST 나온 거 어디서 들을 수 있는지 아는 사람?,SAFE,,,AI,SAFE_AI
+AI1090,G,다들 이거 본방송으로 보는 중임? 나는 스트리밍으로 보는 중,SAFE,,,AI,SAFE_AI
+AI1116,H,의상이랑 소품 고증 엄청 신경 쓴 티가 난다,SAFE,,,AI,SAFE_AI
+AI1100,H,세트장 디테일 미쳤다 제작비 엄청 들었을 듯,SAFE,,,AI,SAFE_AI
+AI1096,H,배우들 눈빛 연기 진짜 장난 아니네 몰입감 대박이다,SAFE,,,AI,SAFE_AI
+AI1092,H,연출이랑 카메라 구도 미쳤다 진짜 영화 같아,SAFE,,,AI,SAFE_AI
+AI1108,H,배우 목소리 톤이랑 발성 진짜 귀에 쏙쏙 박힌다,SAFE,,,AI,SAFE_AI
+AI1115,E1,주인공이랑 조연 관계가 나중에 완전히 틀어질 것 같아,SAFE,,,AI,SAFE_AI
+AI1099,E1,왠지 범인은 전혀 예상외의 인물일 것 같음,SAFE,,,AI,SAFE_AI
+AI1095,E1,주인공이 나중에 엄청 큰 비밀을 알게 되지 않을까?,SAFE,,,AI,SAFE_AI
+AI1091,E1,내 생각엔 다음 화에서 전부 다 밝혀질 것 같음 ㅋㅋ,SAFE,,,AI,SAFE_AI
+AI1107,E1,다음 에피소드에서 엄청난 사건 터질 것 같은 느낌이야,SAFE,,,AI,SAFE_AI
+CUR01,G,커피 마시면서 1화 다시 보는 중,SAFE,,,CURATED,SAFE_REAL
+CUR02,G,식당에서 밥 먹으면서 정주행 하는 중 ㅋㅋ,SAFE,,,CURATED,SAFE_REAL
+CUR03,G,자막 싱크 안 맞는 사람 나만 그래?,SAFE,,,CURATED,SAFE_REAL
+CUR04,G,다들 몇 화까지 봤어?,SAFE,,,CURATED,SAFE_REAL
+CUR05,G,주말에 몰아서 볼 예정,SAFE,,,CURATED,SAFE_REAL
+CUR06,G,이거 어디서 볼 수 있어?,SAFE,,,CURATED,SAFE_REAL
+CUR07,F,5화 엔딩 보고 잠이 안 옴,SAFE,,,CURATED,SAFE_REAL
+CUR08,F,오늘 화 진짜 긴장감 미쳤다,SAFE,,,CURATED,SAFE_REAL
+CUR09,F,OST 너무 좋아,SAFE,,,CURATED,SAFE_REAL
+CUR10,H,소련 배경 나오는 드라마 원래 좋아함,SAFE,,,CURATED,SAFE_REAL
+CUR11,H,위성 CG 퀄리티 생각보다 좋더라,SAFE,,,CURATED,SAFE_REAL
+CUR12,H,요원 역 배우 다른 작품에서도 봤는데 연기 잘함,SAFE,,,CURATED,SAFE_REAL
+CUR13,H,화성 다큐 좋아하는 사람은 이거 무조건 봐야 함,SAFE,,,CURATED,SAFE_REAL
+CUR14,E1,결국 다 꿈이었다는 결말 아닐까?,SAFE,,,CURATED,SAFE_REAL

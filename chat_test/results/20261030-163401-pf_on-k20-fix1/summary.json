@@ -1,0 +1,76 @@
+{
+  "total": 2,
+  "viewers": {
+    "2": {
+      "ok": 2,
+      "leak": 0,
+      "overblock": 0,
+      "must_hide": 2,
+      "may_show": 0,
+      "leak_rate": 0.0,
+      "overblock_rate": null,
+      "accuracy": 100.0
+    },
+    "4": {
+      "ok": 2,
+      "leak": 0,
+      "overblock": 0,
+      "must_hide": 2,
+      "may_show": 0,
+      "leak_rate": 0.0,
+      "overblock_rate": null,
+      "accuracy": 100.0
+    },
+    "6": {
+      "ok": 0,
+      "leak": 0,
+      "overblock": 2,
+      "must_hide": 0,
+      "may_show": 2,
+      "leak_rate": null,
+      "overblock_rate": 100.0,
+      "accuracy": 0.0
+    }
+  },
+  "categories": {
+    "D": {
+      "name": "부분 언급·암시",
+      "count": 2,
+      "expected": "SPOILER",
+      "ok_rate": 66.7,
+      "leak": 0,
+      "overblock": 2,
+      "avg_ms": 2016,
+      "gemini_calls": 2
+    }
+  },
+  "judge": {
+    "spoilers": 2,
+    "match_rate": 0.0,
+    "hidden_rate": 0.0,
+    "exact_episode_rate": 0.0,
+    "event_id_rate": 0.0,
+    "safe": 0,
+    "safe_published_rate": null,
+    "verdicts": {
+      "ERROR": 2
+    },
+    "avg_ms": 2016,
+    "max_ms": 2024,
+    "gemini_calls": 2,
+    "skipped_avg_ms": null,
+    "gemini_avg_ms": 2016
+  },
+  "stability": null,
+  "groups": {
+    "HARD_LEAK": {
+      "count": 2,
+      "expected": "SPOILER",
+      "ok_rate": 66.7,
+      "leak": 0,
+      "overblock": 2,
+      "avg_ms": 2016,
+      "gemini_calls": 2
+    }
+  }
+}

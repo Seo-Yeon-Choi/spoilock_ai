@@ -1,0 +1,6 @@
+﻿id,category,message,expected,episode,event_id,source,note
+T001,F,와 이번 화 엔딩 진짜 미쳤다,SAFE,,,HUMAN,내용 없는 반응
+T002,F,소름 돋았어 ㅋㅋㅋ,SAFE,,,HUMAN,
+T003,G,다음 화 몇 시에 올라와?,SAFE,,,HUMAN,일상
+T004,G,점심 뭐 먹지,SAFE,,,HUMAN,무관
+T005,F,배우들 연기 다 좋더라,SAFE,,,HUMAN,

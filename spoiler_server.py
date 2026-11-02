@@ -30,7 +30,10 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 import prefilter
-GEMINI_TIMEOUT_S = float(os.getenv("GEMINI_TIMEOUT_S", "8"))
+GEMINI_TIMEOUT_S = float(os.getenv("GEMINI_TIMEOUT_S", "15"))
+# 1차 필터가 일반 대화로 넘긴 문장이라도 사건과 이 값 이상 비슷하면 Gemini 로 다시 확인 (비우면 끔)
+_rescue = os.getenv("PREFILTER_RESCUE_SIM", "0.87").strip()
+PREFILTER_RESCUE_SIM = float(_rescue) if _rescue else None
 # 장문 메시지: 이 길이 이상이면 문장 단위로 나눠 사건을 추가 검색
 LONG_MESSAGE_CHARS = int(os.getenv("LONG_MESSAGE_CHARS", "60"))
 CHUNK_TOP_K = int(os.getenv("CHUNK_TOP_K", "8"))          # 문장 하나당 추가로 찾을 후보 수
@@ -112,6 +115,14 @@ try:
 except Exception as e:
     print(f"[startup] subtitle ingest / event admin api disabled: {type(e).__name__}: {e}", flush=True)
 
+# 게시글 이미지 스포일러 판정 (영상 + 자막 분석 드라마)
+try:
+    import image_judge
+    app.include_router(image_judge.router)
+    print("[startup] image judge api enabled", flush=True)
+except Exception as e:  # noqa: BLE001
+    print(f"[startup] image judge api disabled: {type(e).__name__}: {e}", flush=True)
+
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "").strip()
 
 
@@ -166,14 +177,33 @@ Additional rules:
 - matched_event_ids must be [] unless verdict is MATCH.
 - Use UNCERTAIN only when two or more candidates fit one fact equally well, or when the message
   states a plot fact but is too vague to tell which candidate it refers to.
-- Judge by the information a reader learns, not by the tone. A reaction or emotion that
-  describes what happened still reveals the fact and is a MATCH.
+- When several candidates share a topic (a transfer, a satellite, an aircraft, a government lie),
+  pick the one whose specific details match the message (who, what, where). Do not fall back to an
+  earlier or more general candidate just because the topic is the same.
+- event_id must be one of the candidate ids exactly as given (E1, E2, ...).
+- Korean endings that report something seen or heard state a fact, not a guess:
+  "~하더라", "~했대", "~래", "~네", "~구나", "~었어", "~더라고", "~라니", "~는 장면".
+  "~나 봐" / "~인가 봐" / "~것 같더라" describing what happened in the episode also state a fact.
+  Only messages about the future or the unknown ("~일까?", "~할 것 같아", "~하지 않을까")
+  are guesses.
+- Judge by the information a reader learns, not by the tone. A reaction, joke or emotion that
+  describes what happened still reveals the fact and is a MATCH, even if the emotion comes first
+  or last ("~라니 무섭다", "~하는 거 개웃김", "~장면 흥미로웠음", "~해서 소름").
   e.g. "CCTV에 그림자 보이는 거 소름이었어" reveals that a shadow appears on the CCTV,
   so it matches a candidate about a shadowy figure caught on CCTV.
   e.g. "걔 죽는 장면 진짜 슬펐다" reveals the death → MATCH.
 - Pure reactions with no story information ("소름", "대박", "이번 화 미쳤다", "연기 좋다"),
   questions and guesses/predictions ("~일까?", "~인 것 같아", "I think", "maybe") are NOT a MATCH,
   even if they name a character or the show; return NO_MATCH for them.
+
+Also set guessed_event_ids (array):
+- When the message is a guess, question or prediction ("~일 것 같아", "~아닐까?", "~일까?",
+  "~하지 않을까", "혹시 ~?") and its content, if it were true, would reveal the same core fact as a
+  candidate, list those candidate ids (E1, E2, ...). The guess may be phrased as uncertain; what
+  matters is that it points at the same fact.
+- Use [] when the message is not a guess, when the guess contradicts or does not match any
+  candidate (a wrong guess), or when it only names a character or topic.
+- Never put an id in both matched_event_ids and guessed_event_ids.
 
 Also set reveals_plot (boolean) for the chat message itself:
 - true if the message lets a reader learn story information: what happened, what was seen in a
@@ -193,8 +223,9 @@ def _match_schema():
     props = schema.setdefault("properties", {})
     props["reveals_plot"] = {"type": "boolean"}
     props["matched_event_ids"] = {"type": "array", "items": {"type": "string"}}
+    props["guessed_event_ids"] = {"type": "array", "items": {"type": "string"}}
     required = schema.setdefault("required", [])
-    for field in ("reveals_plot", "matched_event_ids"):
+    for field in ("reveals_plot", "matched_event_ids", "guessed_event_ids"):
         if field not in required:
             required.append(field)
     return schema
@@ -209,12 +240,35 @@ def _split_answer(raw):
     return core, (reveals if isinstance(reveals, bool) else None)
 
 
-EXTRA_FIELDS = ("reveals_plot", "matched_event_ids")
+EXTRA_FIELDS = ("reveals_plot", "matched_event_ids", "guessed_event_ids")
 
 
-def _matched_ids(raw):
+def _unalias(raw, alias_map):
+    """Gemini 응답의 짧은 번호(E3, e3, "E 3")를 실제 사건 ID 로. 실제 ID 를 그대로 쓴 경우도 허용"""
+    if not isinstance(raw, dict):
+        return raw
+    real_ids = set(alias_map.values())
+
+    def one(value):
+        if not isinstance(value, str) or not value:
+            return value
+        if value in real_ids:
+            return value
+        key = re.sub(r"\s+", "", value).upper()
+        return alias_map.get(key, value)
+
+    out = dict(raw)
+    if "event_id" in out:
+        out["event_id"] = one(out["event_id"])
+    for field in ("matched_event_ids", "guessed_event_ids"):
+        if isinstance(out.get(field), list):
+            out[field] = [one(v) for v in out[field]]
+    return out
+
+
+def _matched_ids(raw, field="matched_event_ids"):
     """Gemini 가 고른 여러 사건 ID (문자열 목록만 인정)"""
-    ids = raw.get("matched_event_ids") if isinstance(raw, dict) else None
+    ids = raw.get(field) if isinstance(raw, dict) else None
     if not isinstance(ids, list):
         return []
     return [i for i in ids if isinstance(i, str) and i]
@@ -340,6 +394,12 @@ def judge(req: JudgeRequest):
         if prefilter.rule_pass(req.message) is None:          # 규칙 통과면 유사도 계산 생략
             best_sim, best_id = _best_similarity(req, episodes)
         pf = prefilter.decide(req.message, best_sim, PREFILTER_SIM_THRESHOLD)
+        # 일반 대화 규칙("식당", "커피" 등)에 걸렸어도 사건과 매우 비슷하면 Gemini 로 확인
+        if pf.get("decision") == "SKIP" and PREFILTER_RESCUE_SIM is not None:
+            if best_sim is None:
+                best_sim, best_id = _best_similarity(req, episodes)
+            if best_sim is not None and best_sim >= PREFILTER_RESCUE_SIM:
+                pf = {**pf, "decision": "CHECK", "stage": "rescue", "skipped_stage": pf.get("stage")}
         pf.update(mode=mode, best_sim=best_sim, best_event_id=best_id)
         tm["prefilter"] = time.perf_counter() - t
 
@@ -392,9 +452,11 @@ def judge(req: JudgeRequest):
         _log({"at": datetime.now().isoformat(timespec="seconds"), "message": req.message, **result})
         return result
 
+    # Gemini 에는 긴 사건 ID 대신 짧은 번호(E1, E2 …)를 보여줌 → ID 를 잘못 베끼는 오류 방지
+    alias_map = {f"E{i}": e["event_id"] for i, e in enumerate(candidates, 1)}
     prompt_candidates = []
-    for e in candidates:
-        item = {"event_id": e["event_id"], "description": e["description"],
+    for alias, e in zip(alias_map, candidates):
+        item = {"event_id": alias, "description": e["description"],
                 "fact_status": e["fact_status"]}
         if req.include_evidence:
             item["evidence"] = json.loads(e["evidence_json"])
@@ -425,19 +487,22 @@ def judge(req: JudgeRequest):
     id_map = {e["event_id"]: e for e in candidates}
 
     answer, cache_status, error, reveals_plot = None, "MISS", None, None
-    extra_ids = []
+    extra_ids, guess_ids = [], []
     if not req.refresh:
         with _mem_lock:
             if digest in _mem_cache:
                 _mem_cache.move_to_end(digest)
-                answer, reveals_plot = _split_answer(_mem_cache[digest])
-                extra_ids = _matched_ids(_mem_cache[digest])
+                cached = _unalias(_mem_cache[digest], alias_map)
+                answer, reveals_plot = _split_answer(cached)
+                extra_ids = _matched_ids(cached)
+                guess_ids = _matched_ids(cached, "guessed_event_ids")
                 cache_status = "HIT_MEMORY"
         if answer is None and cache_file.is_file():
             try:
-                raw = json.loads(cache_file.read_text(encoding="utf-8")).get("answer")
+                raw = _unalias(json.loads(cache_file.read_text(encoding="utf-8")).get("answer"), alias_map)
                 answer, reveals_plot = _split_answer(raw)
                 extra_ids = _matched_ids(raw)
+                guess_ids = _matched_ids(raw, "guessed_event_ids")
                 base.validate_match_answer(answer, id_map)
                 cache_status = "HIT_FILE"
             except Exception:
@@ -453,8 +518,10 @@ def judge(req: JudgeRequest):
             if not response.text:
                 raise ValueError("Gemini returned an empty response")
             raw_answer = json.loads(response.text)
-            answer, reveals_plot = _split_answer(raw_answer)
-            extra_ids = _matched_ids(raw_answer)
+            mapped = _unalias(raw_answer, alias_map)
+            answer, reveals_plot = _split_answer(mapped)
+            extra_ids = _matched_ids(mapped)
+            guess_ids = _matched_ids(mapped, "guessed_event_ids")
             base.validate_match_answer(answer, id_map)
             u = getattr(response, "usage_metadata", None)
             if u is not None:
@@ -482,7 +549,8 @@ def judge(req: JudgeRequest):
         cache_status = "NONE"
     else:
         with _mem_lock:
-            _mem_cache[digest] = {**answer, "reveals_plot": reveals_plot, "matched_event_ids": extra_ids}
+            _mem_cache[digest] = {**answer, "reveals_plot": reveals_plot, "matched_event_ids": extra_ids,
+                                  "guessed_event_ids": guess_ids}
             if len(_mem_cache) > MEMORY_CACHE_SIZE:
                 _mem_cache.popitem(last=False)
         verdict = answer["verdict"]
@@ -496,6 +564,11 @@ def judge(req: JudgeRequest):
         matched_list = [id_map[i] for i in dict.fromkeys(ids) if i in id_map]
         if matched_list:
             matched = max(matched_list, key=base.effective_episode)
+
+    # 추측·질문인데 사건 내용과 맞는 경우 (Spring 이 작성자 시청 진도와 비교: 이미 본 회차면 스포로 처리)
+    matched_ids = {e["event_id"] for e in matched_list}
+    guess_list = [] if error is not None else [
+        id_map[i] for i in dict.fromkeys(guess_ids) if i in id_map and i not in matched_ids]
 
     # MATCH 이외(NO_MATCH/UNCERTAIN/ERROR)는 회차를 정할 수 없으므로 fail-closed
     required_episode = base.effective_episode(matched) if matched else None
@@ -511,6 +584,12 @@ def judge(req: JudgeRequest):
         "required_episode_number": required_episode,  # chat_messages.required_episode_number
         "episode_basis": episode_basis,
         "needs_review": matched is None,              # True면 Spring은 HIDDEN/대기 처리
+        # 추측이지만 사건과 맞음: 작성자가 이 회차를 이미 봤다면 Spring 이 그 회차부터 공개
+        "guess_event_ids": [e["event_id"] for e in guess_list],
+        "guess_episodes": sorted({base.effective_episode(e) for e in guess_list}),
+        "guess_basis": (None if not guess_list else
+                        base.VERIFIED_BASIS if all(base.is_verified(e) for e in guess_list)
+                        else base.UNVERIFIED_BASIS),
         "reason": answer.get("reason") if answer else None,   # 관리자용. 사용자에게 보내지 말 것
         # 줄거리 정보를 사실로 드러내는지 (Gemini 판단). false = 감상·질문·추측·잡담
         "reveals_plot": reveals_plot,
@@ -527,6 +606,9 @@ def judge(req: JudgeRequest):
         result["matched_event_descriptions"] = [
             f'{base.effective_episode(e)}화'
             f'{"" if base.is_verified(e) else "(미검수)"}: {e["description"]}' for e in matched_list]
+    if req.debug and guess_list:
+        result["guess_event_descriptions"] = [
+            f'{base.effective_episode(e)}화: {e["description"]}' for e in guess_list]
     if req.watched_episode is not None:   # 데모 화면용 공개 판정 (원본 규칙 그대로)
         visibility, _ = base.decide_visibility(matched, req.watched_episode)
         result["watched_episode_number"] = req.watched_episode

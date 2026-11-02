@@ -1,0 +1,218 @@
+﻿event_id,episode,source_episode,verification_status,event_type,description
+d1-e101-local-csy-f0001,1,1,PENDING,DISCOVERY,천문대 관측소에서 인공물체로 보이는 NEO94853의 전날 캡처 화면을 발견하고 확인한다.
+d1-e101-local-csy-f0002,1,1,PENDING,DISCOVERY,발견된 물체가 위성이나 추적 중인 탐사선이 아니며 지구를 향해 다가오고 있는 궤도에 있다고 언급한다.
+d1-e101-local-csy-f0003,1,1,PENDING,DISCOVERY,테일러가 여객기가 몬태나 상공에서 폭파된 것으로 추정된다고 보고한다.
+d1-e101-local-csy-f0004,1,1,PENDING,DISCOVERY,주변 병원들에서 방사선 자국과 일치하는 증상을 가진 환자들이 다수 발생하고 있다고 보고된다.
+d1-e101-local-csy-f0005,1,1,PENDING,MAJOR_EVENT,스테이션 타운십 및 반경 10마일 이내 지역에 격리 조치가 내려진다.
+d1-e101-local-csy-f0006,1,1,PENDING,REVELATION,테일러가 여객기가 몬타나 상공에서 폭파되었을 가능성을 언급한다.
+d1-e101-local-csy-f0007,1,1,PENDING,DISCOVERY,주변 병원들에서 방사능 자극 증상을 보이는 환자들이 보고되고 있다고 언급된다.
+d1-e101-local-csy-f0008,1,1,PENDING,MAJOR_EVENT,테일러가 스테이션 타운십과 반경 10마일 이내 지역에 격리 조치를 내린다.
+d1-e101-local-csy-f0009,1,1,PENDING,MAJOR_EVENT,비행기 동체로 추정되는 주요 잔해가 캐나다 에드먼턴 외곽의 숲 지역에 추락한다.
+d1-e101-local-csy-f0010,1,1,PENDING,MAJOR_EVENT,테일러와 라슨 요원이 에드먼턴으로 출발할 준비를 한다.
+d1-e101-local-csy-f0011,1,1,PENDING,REVELATION,부장관이 테러범을 체포했다고 지금 발표하라고 압박하고 있다고 톰이 언급함.
+d1-e101-local-csy-f0012,1,1,PENDING,MAJOR_EVENT,용의자가 해치가 열렸을 때 러시아어로 소리 지르기 시작했으며 오른손에 권총을 들고 있었다고 언급됨.
+d1-e101-local-csy-f0013,1,1,PENDING,MAJOR_EVENT,용의자는 극도로 탈수 및 영양실조 상태였으나 현재는 안정되었으며 생존 가능성이 있다고 의사가 밝힘.
+d1-e101-local-csy-f0014,1,1,PENDING,MAJOR_EVENT,의사가 소년의 상태가 안정적이며 극심한 탈수와 영양실조를 겪었으나 생존 가능성이 있다고 전했다.
+d1-e101-local-csy-f0015,1,1,PENDING,MAJOR_EVENT,발견 당시 소년이 러시아어로 자신을 확인하라는 등의 말을 반복했다고 전해졌다.
+d1-e101-local-csy-f0016,1,1,PENDING,DISCOVERY,캡슐 안에서 돌들과 러시아어로 된 비행 매뉴얼 페이지로 보이는 물품들이 발견되었다.
+d1-e101-local-csy-f0017,1,1,PENDING,DISCOVERY,조사관들이 캡슐 안에서 바위들과 러시아제 비행 매뉴얼로 보이는 페이지를 발견한다.
+d1-e101-local-csy-f0018,1,1,PENDING,REVELATION,상관은 캡슐 사건을 미국에 대한 공격 또는 테러리즘 가능성으로 의심하며 테러리스트나 러시아 국적자로 추정한다.
+d1-e101-local-csy-f0019,1,1,PENDING,DISCOVERY,캘거리 외곽에서 회수한 캡슐 부품 안에 있던 핵 배터리가 방사능의 출처인 것으로 밝혀진다.
+d1-e101-local-csy-f0020,1,1,PENDING,DISCOVERY,캘거리 외곽에서 방사능의 출처인 핵 배터리가 실린 캡슐의 또 다른 조각이 회수되었다.
+d1-e101-local-csy-f0021,1,1,PENDING,DISCOVERY,의사 버트람이 테일러에게 아이가 암에 걸렸으며 온몸에 퍼져 있다고 보고했다.
+d1-e101-local-csy-f0022,1,1,PENDING,DISCOVERY,의사 버트람이 아이가 호흡기 감염을 앓고 있으며 치료에 반응하지 않고 비행기에 태우면 사망할 수도 있다고 경고했다.
+d1-e101-local-csy-f0023,1,1,PENDING,MAJOR_EVENT,의사가 환자의 몸에 암이 퍼졌으며 호흡기 감염까지 발병하여 치료에 반응하지 않는 상태라고 보고한다.
+d1-e101-local-csy-f0024,1,1,PENDING,MAJOR_EVENT,"의사가 환자를 비행기에 태우면 사망할 수도 있다고 경고하자, 한 인물이 아랑곳하지 않고 미국으로 데려가겠다고 지시한다."
+d1-e101-local-csy-f0025,1,1,PENDING,RELATIONSHIP,한 인물이 Tom Taylor에게 전화하여 소련에 대한 통찰을 구하며 소련의 과거 행적에 대해 대화를 나눈다.
+d1-e101-local-csy-f0026,1,1,PENDING,MAJOR_EVENT,통화 중 과거 소련의 에어 방공군 소속이었던 Stanislav Petrov와 1983년 모스크바 외곽 벙커에서의 일에 대한 이야기가 언급된다.
+d1-e101-local-csy-f0027,1,1,PENDING,MAJOR_EVENT,스탈라슬라프 페트로프가 1983년 모스크바 인근 벙커에서 소련 조기 경보 시스템인 오코를 모니터링하는 임무를 맡고 있었다.
+d1-e101-local-csy-f0028,1,1,PENDING,MAJOR_EVENT,"오코 시스템의 경보로 미국이 핵미사일을 발사했다는 신호가 들어왔으나, 스탈라슬라프 페트로프가 지시를 따르지 않고 경보를 껐다."
+d1-e101-local-csy-f0029,1,1,PENDING,DISCOVERY,구름 등에 반사된 태양빛 때문에 위성이 오작동하여 미사일이 발사된 것으로 오인했던 것으로 밝혀졌다.
+d1-e101-local-csy-f0030,1,1,PENDING,REVELATION,한 인물이 국가의 명령을 거부하고 세상을 구한 뒤 불명예 제대하여 시베리아 등으로 보내졌다는 사실이 언급된다.
+d1-e101-local-csy-f0031,1,1,PENDING,MAJOR_EVENT,관계자들은 언론의 추궁을 막기 위해 오래된 구소련 위성의 배터리 누출로 추락했다는 거짓 이야기를 언론에 배포하기로 결정한다.
+d1-e101-local-csy-f0032,1,1,PENDING,MAJOR_EVENT,인물들은 연방 교도소로 이송될 위기에 처한 아이를 조사하며 시간을 벌기 위해 팩스 관련 증거를 은폐하려 한다.
+d1-e101-local-csy-f0033,1,1,PENDING,DISCOVERY,톰 테일러가 잭커리 월저 박사를 찾아가 문제의 폭발 사건이 더티  бом브(dirty bomb)가 아니었다고 주장하며 관련 이야기를 꺼낸다.
+d1-e101-local-csy-f0034,1,1,PENDING,REVELATION,Tom Taylor가 Zachary Walzer 박사를 찾아가 더티 밥 사건이 실제로는 위성 추락 사건과 관련이 있다고 주장한다.
+d1-e101-local-csy-f0035,1,1,PENDING,MAJOR_EVENT,Zachary Walzer는 항공우주학 석사와 핵공학 박사 학위를 가지고 있으며 천체 역학과 유인 우주 비행에 관한 책을 저술했다고 밝힌다.
+d1-e101-local-csy-f0036,1,1,PENDING,REVELATION,"요원들이 박사에게 소련 위성으로 위장된 캡슐 안에서 발견된 인물을 보여주며, 그가 화성에서 1980년대 중반부터 살아왔다고 주장하는 소련 우주비행사가 남긴 메모와 함께 화성에서 태어났다고 밝혔다."
+d1-e102-local-csy-f0001,2,2,PENDING,MAJOR_EVENT,Dr. Walzer가 위원회 회의에서 화성 탐사의 중요성과 지속 가능한 유인 화성 탐사 계획에 대해 연설한다.
+d1-e102-local-csy-f0002,2,2,PENDING,REVELATION,Dr. Walzer는 위원회 브리핑에서 자신이 제안한 화성 탐사 임무가 현지 자원 활용(in-situ resource utilization) 방식을 기반으로 할 것이라고 추정한다.
+d1-e102-local-csy-f0003,2,2,PENDING,MAJOR_EVENT,"월처 박사가 화성 임무의 가능성에 대해 자신의 접근 방식을 설명하자, 테일러가 이를 책에 대한 홍보로 여기며 중단시킨다."
+d1-e102-local-csy-f0004,2,2,PENDING,DISCOVERY,의사가 환자가 반응을 보이며 죽어가고 있으나 면역결핍증 등 검사 결과는 모두 음성으로 나오고 원인을 알 수 없다고 보고한다.
+d1-e102-local-csy-f0005,2,2,PENDING,MAJOR_EVENT,의사는 환자가 암 외에도 원인을 알 수 없는 반응으로 죽어가고 있다고 보고한다.
+d1-e102-local-csy-f0006,2,2,PENDING,MAJOR_EVENT,국토안보부 차관실에서 용의자에 대한 진행 상황을 요구한다.
+d1-e102-local-csy-f0007,2,2,PENDING,MAJOR_EVENT,등장인물들은 환자를 테러리스트로 돌려보내면 진실을 알 수 없을 것이라고 말한다.
+d1-e102-local-csy-f0008,2,2,PENDING,REVELATION,월저 박사는 미국 정부가 화성 관련 주장을 믿지 않으며 테러 대응에만 관심이 있다고 언급한다.
+d1-e102-local-csy-f0009,2,2,PENDING,REVELATION,러시아 측이 자국의 인공위성을 잃어버린 적이 없으며 미국 측이 무엇을 알고 있는지 문의하기 위해 연락해 왔다고 보고된다.
+d1-e102-local-csy-f0010,2,2,PENDING,MAJOR_EVENT,캐나다 정부의 공식 대표 자격으로 온 벤톤 대위가 작전 책임자에게 체포를 명령받았다고 밝힌다.
+d1-e102-local-csy-f0011,2,2,PENDING,MAJOR_EVENT,캡틴 벤톤이 캐나다 정부의 명령을 받아 체포를 집행하겠다고 선언한다.
+d1-e102-local-csy-f0012,2,2,PENDING,IDENTITY,클라이브 앤더튼이 애리조나 골드스톤의 스페이스가드에서 근지구천체를 추적하는 업무를 하고 있다고 밝힌다.
+d1-e102-local-csy-f0013,2,2,PENDING,REVELATION,클라이브 앤더튼이 자신은 애리조나주 골드스톤 소속이며 스페이스가드와 함께 지구 근접 물체를 추적하는 소행성 추적가라고 밝힌다.
+d1-e102-local-csy-f0014,2,2,PENDING,MAJOR_EVENT,"통화 중인 인물이 캐나다인들이 국경을 폐쇄하겠다고 위협하고 있으며, 그 일이 일어나기 전에 용의자를 추출하기 위해 팀을 파견하겠다고 지시한다."
+d1-e102-local-csy-f0015,2,2,PENDING,DISCOVERY,클라이브 앤더튼과 다른 인물이 사진 속 물체가 러시아의 소유즈 우주선처럼 보인다고 언급한다.
+d1-e102-local-csy-f0016,2,2,PENDING,MAJOR_EVENT,클라이브 앤더튼은 수요일 밤과 금요일 추락 사이에 궤도가 얕아지려면 물체가 속도를 줄였어야 한다고 주장한다.
+d1-e102-local-csy-f0017,2,2,PENDING,MAJOR_EVENT,등장인물들이 캡슐의 궤도가 심하게 얕아진 이유가 마치 우리를 잡으려던 것처럼 속도가 줄어들었기 때문이라고 추정함.
+d1-e102-local-csy-f0018,2,2,PENDING,DISCOVERY,한 인물이 캡슐에서 발견된 화성의 돌이 화성 생명체의 화석화된 증거이자 메시지라고 주장함.
+d1-e102-local-csy-f0019,2,2,PENDING,MAJOR_EVENT,"서비스 모듈에 있어야 할 핵 배터리가 분리되지 않고 전체가 재진입했으며, 그것이 무기로 사용하기 위해 의도적으로 행해졌을 수 있다는 대화가 나뉨."
+d1-e102-local-csy-f0020,2,2,PENDING,MAJOR_EVENT,"외계인이 말을 시작할지 여부에 대해 논의하던 중, 그의 면역 체계가 손상되어 무언가에 반응을 보이고 있다고 언급됨."
+d1-e102-local-csy-f0021,2,2,PENDING,MAJOR_EVENT,한 인물이 핵 배터리가 장착된 우주선 모듈이 고의로 재돌입했을 가능성을 제기했다.
+d1-e102-local-csy-f0022,2,2,PENDING,DISCOVERY,의사가 소년의 면역계가 손상되어 무엇인가에 반응을 보이고 있다고 밝혔다.
+d1-e102-local-csy-f0023,2,2,PENDING,DISCOVERY,의사가 소년이 온몸에 암이 퍼져 있으며 강한 우주 방사선에 노출된 것 같다고 설명했다.
+d1-e102-local-csy-f0024,2,2,PENDING,MAJOR_EVENT,뉴욕 타임스에 화성 관련 이야기가 유출되었으나 신문사 측에서 이를 믿지 않아 보도하지 않기로 했다.
+d1-e102-local-csy-f0025,2,2,PENDING,MAJOR_EVENT,뉴욕 타임스가 화성 관련 이야기를 입수했으나 진실성을 믿지 않아 보도하지 않기로 했다.
+d1-e102-local-csy-f0026,2,2,PENDING,DISCOVERY,누군가 화성에서 온 우주비행사를 감금하고 있다는 이야기를 언론에 유출했다.
+d1-e102-local-csy-f0027,2,2,PENDING,MAJOR_EVENT,아폴로 11호 귀환 당시 통과된 외계 생체 오염 방지법에 따라 캡슐이나 탑승자와 접촉한 모든 구역과 사람들을 격리해야 할 법적 요구사항이 있을 수 있다고 언급했다.
+d1-e102-local-csy-f0028,2,2,PENDING,REVELATION,신문에 화성 관련 이야기가 유출되었으나 신문사 측에서 사실로 믿지 않아 기사가 보도되지 않았다.
+d1-e102-local-csy-f0029,2,2,PENDING,MAJOR_EVENT,의사가 화성에서 온 것과 관련된 존재를 다루고 있다면 법적으로 해당 지역과 접촉자들을 격리해야 할 요구사항이 있을 수 있다고 언급했다.
+d1-e102-local-csy-f0030,2,2,PENDING,MAJOR_EVENT,격리 프로토콜이 시작되었으며 환자 치료를 위해 더 많은 돌봄이 필요하다는 사실이 확인되었다.
+d1-e102-local-csy-f0031,2,2,PENDING,REVELATION,에릭 매클렐런 차관이 이틀 전 캐나다 에드먼턴 근처에 위성이 추락하여 몬태나주 일대에 핵물질을 퍼뜨렸다고 발표했다.
+d1-e102-local-csy-f0032,2,2,PENDING,REVELATION,에릭 매클렐런 차관은 이번 위성 추락 사고가 적대적 의도가 없는 단순 사고로 보이며 러시아 정부와 소통 중이라고 밝혔다.
+d1-e102-local-csy-f0033,2,2,PENDING,MAJOR_EVENT,캐나다 정부가 토마스 테일러 국장이 이끄는 미국 태스크포스가 캘거리에 남는 것에 동의했다고 밝혔다.
+d1-e102-local-csy-f0034,2,2,PENDING,MAJOR_EVENT,에릭 매클렐런 부장관이 캐나다 근처에 추락한 인공위성과 몬태나주에 퍼진 핵물질에 대해 사고이며 적대적 의도는 없다고 발표했다.
+d1-e102-local-csy-f0035,2,2,PENDING,MAJOR_EVENT,토마스 테일러 국장이 이끄는 미국 태스크포스가 조사 기간 동안 캘거리에 남기로 합의되었다.
+d1-e102-local-csy-f0036,2,2,PENDING,MAJOR_EVENT,에릭 매클렐런은 러시아가 무언가를 숨기고 있을지 모른다고 언급하며 조사할 시간을 벌어주었다고 밝혔다.
+d1-e102-local-csy-f0037,2,2,PENDING,MAJOR_EVENT,허가받지 않은 외부 통화를 한 앤더턴이 기지 밖으로 호송되어 쫓겨나게 되었다.
+d1-e102-local-csy-f0038,2,2,PENDING,MAJOR_EVENT,"Anderton이 기지 밖으로 호송되며, 무단 외부 통화와 언론 유출 문제로 추궁을 받는다."
+d1-e102-local-csy-f0039,2,2,PENDING,DISCOVERY,Clive가 언론 유출자로 밝혀져 더 이상 함께 일하지 않게 된다.
+d1-e102-local-csy-f0040,2,2,PENDING,MAJOR_EVENT,소년의 이름이 아직 알려지지 않아 임시로 '유리(Yuri)'라고 부르기로 한다.
+d1-e102-local-csy-f0041,2,2,PENDING,REVELATION,클라이브가 내부 유출자임이 밝혀져 더 이상 함께 일하지 않게 되었다.
+d1-e102-local-csy-f0042,2,2,PENDING,IDENTITY,소년의 이름이 일단 유리로 불리게 되었다.
+d1-e102-local-csy-f0043,2,2,PENDING,DISCOVERY,의사가 소년의 이야기에 뒷받침하는 증거가 있지만 살아남은 것에는 뭔가 빠진 요소가 있는 것 같다고 언급한다.
+d1-e103-local-csy-f0001,3,3,VERIFIED,MAJOR_EVENT,유리가 아직도 한 마디도 하지 않았다고 언급됨
+d1-e103-local-csy-f0002,3,3,PENDING,MAJOR_EVENT,한 인물이 다른 인물에게 그가 아무 말도 하지 않고 있으며 공포에 질려 있을 것이라고 언급한다.
+d1-e103-local-csy-f0003,3,3,PENDING,MAJOR_EVENT,기지 내에 검역 조치가 유지되고 있어 기지를 떠나기가 어렵다고 언급된다.
+d1-e103-local-csy-f0004,3,3,PENDING,MAJOR_EVENT,아이를 안전하게 지키는 것이 가장 중요하다고 언급된다.
+d1-e103-local-csy-f0005,3,3,PENDING,MAJOR_EVENT,"소년이 이곳에 이송된 이후 충격 상태에 빠져 있으며, 신체적으로는 말을 하는 데 지장이 없다고 의사가 전한다."
+d1-e103-local-csy-f0006,3,3,PENDING,MAJOR_EVENT,캠벨이 러시아어를 할 줄 안다는 이유로 충격 상태에 빠진 환자에게 불려간다.
+d1-e103-local-csy-f0007,3,3,PENDING,MAJOR_EVENT,의사가 의사 자신과 강아지 라이카에 대한 이야기를 나눈다.
+d1-e103-local-csy-f0008,3,3,PENDING,REVELATION,부모가 아직 살아있을지도 모른다는 가능성에 대해 언급한다.
+d1-e103-local-csy-f0009,3,3,PENDING,IDENTITY,제인이 상대방에게 이름을 Jane 또는 Jay라고 밝힌다.
+d1-e103-local-csy-f0010,3,3,PENDING,MAJOR_EVENT,"제인이 왕과 파이어버드(불새), 그리고 막내아들 이반에 관한 이야기를 들려준다."
+d1-e103-local-csy-f0011,3,3,PENDING,MAJOR_EVENT,제인이 나중에 그림을 그리면 이야기의 결말을 마저 들려주겠다고 말한다.
+d1-e103-local-csy-f0012,3,3,PENDING,MAJOR_EVENT,"인물이 메스홀(식당)을 찾아와 커피를 찾고, 옛 소비에트 우주 프로그램 역사에 대해 조사 중이라고 말한다."
+d1-e103-local-csy-f0013,3,3,PENDING,IDENTITY,메스홀에서 만난 인물이 자신의 이름을 Jane Campbell이라고 밝힌다.
+d1-e103-local-csy-f0014,3,3,PENDING,IDENTITY,"제인 캠벨이 아들라이 디레오에게 자신은 소아암 환자들을 돌보며 일하고 있으며, 버트람 박사의 인턴이었던 경력 때문에 이곳에 오게 되었다고 밝혔다."
+d1-e103-local-csy-f0015,3,3,PENDING,MAJOR_EVENT,Jane은 유리가 침대 난간에 팔을 부딪혀 뼈가 부러졌다고 말한다.
+d1-e103-local-csy-f0016,3,3,PENDING,DISCOVERY,유리가 골다공증 유사 증상을 겪으며 뼈가 부러진 상태가 발견된다.
+d1-e103-local-csy-f0017,3,3,PENDING,REVELATION,한 인물이 유리가 화성에서 왔다는 증거가 있다고 주장한다.
+d1-e103-local-csy-f0018,3,3,PENDING,DISCOVERY,연구 결과 소련 우주 계획 역사상 화성 유인 탐사 임무에 대한 단서를 찾지 못했다.
+d1-e103-local-csy-f0019,3,3,PENDING,DISCOVERY,유리가 골다공증 유사 증상을 보이는 것은 우주에서 장기간 무중력 상태를 겪어 골밀도가 심각하게 손실되었기 때문이라는 주장이 제기된다.
+d1-e103-local-csy-f0020,3,3,PENDING,DISCOVERY,소련의 유인 화성 탐사 임무에 대한 기록이나 유리가 타고 온 캡슐이 그러한 용도로 설계되었다는 흔적을 찾을 수 없었다고 언급된다.
+d1-e103-local-csy-f0021,3,3,PENDING,DISCOVERY,천문대 이미지를 통해 캡슐이 심우주에서 온 것으로 확인되었다고 언급된다.
+d1-e103-local-csy-f0022,3,3,PENDING,DISCOVERY,의사가 캡슐을 볼 수 있는 허가를 받고 유리의 그림과 화성이 밤하늘에 나타나는 패턴이 일치한다는 것을 발견한다.
+d1-e103-local-csy-f0023,3,3,PENDING,RELATIONSHIP,토마스가 유리에게 결혼을 청혼한다.
+d1-e104-local-csy-f0001,4,4,PENDING,REVELATION,사이먼 몬탁이 캐나다 캘거리의 격리 조치와 관련된 공식 발표(추락한 구소련 위성이라는 설명)에 대해 은폐가 이루어지고 있으며 미국의 비밀 유지 때문이라고 주장한다.
+d1-e104-local-csy-f0002,4,4,PENDING,REVELATION,국토안보부 장관실의 수석 고문인 데이비드 콜린스가 캘거리의 검역 및 격리 조치는 방사선 우려에 따른 예방적 조치라고 해명한다.
+d1-e104-local-csy-f0003,4,4,PENDING,REVELATION,사이먼 몬탁이 파편이 실제 추락한 에드먼턴 기지가 아니라 미국과 더 가까운 캘거리의 폐쇄된 기지로 수거된 점과 의료 보급품이 해당 기지로 반입되는 목격담을 언급하며 격리 조치가 비밀 유지를 위한 것이라고 주장한다.
+d1-e104-local-csy-f0004,4,4,PENDING,REVELATION,몬타그가 캘거리가 아닌 비활성 기지에 잔해가 수집된 이유와 검역 구역 내 의료품 반입에 대해 의문을 제기하며 정부가 비밀을 숨기고 있다고 주장한다.
+d1-e104-local-csy-f0005,4,4,PENDING,IDENTITY,에릭 맥클렐란이 밀러 장관의 대리인 자격으로 대사와 면담하기 위해 등장한다.
+d1-e104-local-csy-f0006,4,4,PENDING,IDENTITY,대사가 에릭 맥클렐런에게 자신이 밀러 장관의 대리인이며 대통령과 밀러 장관으로부터 권한을 위임받았다고 밝혔다.
+d1-e104-local-csy-f0007,4,4,PENDING,REVELATION,대사가 하늘에서 떨어진 방사능 물질이 소련의 하드웨어라고 주장했다.
+d1-e104-local-csy-f0008,4,4,PENDING,REVELATION,대사가 미국 정부가 자신들의 우주비행사(cosmonauts) 한 명 이상을 붙잡고 있다고 주장했다.
+d1-e104-local-csy-f0009,4,4,PENDING,REVELATION,대사가 러시아 대사에게 인공위성에 우주비행사들이 타고 있었으며 오래 전에 잃어버렸다고 주장한다.
+d1-e104-local-csy-f0010,4,4,PENDING,REVELATION,"러시아 대사가 우주비행사들이 아주 먼 곳, 즉 화성에서 왔다고 주장한다."
+d1-e104-local-csy-f0011,4,4,PENDING,MAJOR_EVENT,인물이 그가 실제로 화성에서 돌아왔을 경우에 대해 가정하며 국적 문제를 논의한다.
+d1-e104-local-csy-f0012,4,4,PENDING,MAJOR_EVENT,한 인물이 용의자가 화성에서 돌아왔다는 가정 하에 국적 및 법적 지위에 대해 가설을 세운다.
+d1-e104-local-csy-f0013,4,4,PENDING,MAJOR_EVENT,상관이 밀러 대신 백악관에 있는 제이콥스에게 먼저 보고하라고 지시한다.
+d1-e104-local-csy-f0014,4,4,PENDING,REVELATION,한 대화자가 용의자가 영어로 말할 때 이해하는 반응을 보였다고 진술한다.
+d1-e104-local-csy-f0015,4,4,PENDING,REVELATION,그가 영어로 말을 걸었을 때 이해하는 듯한 반응을 보였다고 언급했다.
+d1-e104-local-csy-f0016,4,4,PENDING,DISCOVERY,리처드 해드필드 박사가 기지 안에 안드로메다 스트레인(The Andromeda Strain)이 있다고 주장하며 기자들에게 연락하고 있다고 보고했다.
+d1-e104-local-csy-f0017,4,4,PENDING,REVELATION,두 사람이 기지를 떠나 보급 트럭 중 하나를 미행하는 모습이 목격되었다는 보고가 있다고 전했다.
+d1-e104-local-csy-f0018,4,4,PENDING,REVELATION,격리 구역으로 연행된 사람 중 한 명이 워싱턴 대학교의 겸임 교원이자 화성 탐사 주창자인 재커리 월저 박사라고 방송에서 보도했다.
+d1-e104-local-csy-f0019,4,4,PENDING,MAJOR_EVENT,목격자가 기지와 인근 공급 트럭을 미행하는 두 명의 남성을 보았다는 보고가 제기되었다.
+d1-e104-local-csy-f0020,4,4,PENDING,REVELATION,프로그램을 통해 격리 구역에 들어간 인물이 화성 탐사 옹호론자인 재커리 월저 박사라는 사실이 보도되었다.
+d1-e104-local-csy-f0021,4,4,PENDING,REVELATION,한 인물이 왜 화성 전문가가 화성과 무관해 보이는 소련 위성 추락 사고 조사에 참여했는지 의문을 제기한다.
+d1-e104-local-csy-f0022,4,4,PENDING,MAJOR_EVENT,미국 정부가 러시아 및 구소련 정부의 시민을 구금하고 있지 않다는 것이 공식 입장임을 대사에게 밝힌다.
+d1-e104-local-csy-f0023,4,4,PENDING,REVELATION,미국 정부가 러시아 또는 구소련 정부의 시민을 억류하고 있지 않다는 것이 공식 입장임을 밝힌다.
+d1-e104-local-csy-f0024,4,4,PENDING,MAJOR_EVENT,미국 측이 테러 행위 수사와 관련해 용의자를 적십자 적대행위자(적격 전투원)로 구금하고 있다고 밝힌다.
+d1-e104-local-csy-f0025,4,4,PENDING,REVELATION,러시아 대사는 화성 우주 탐사 분야의 최고 권위자가 수사에 협조하고 있는 이유에 대해 질문한다.
+d1-e104-local-csy-f0026,4,4,PENDING,MAJOR_EVENT,러시아 측이 화성 관련 이야기를 커버 스토리로 사용하고 있다고 언급한다.
+d1-e104-local-csy-f0027,4,4,PENDING,DISCOVERY,전문가 인물이 유리(Yuri)의 캡슐 재활용 시스템에서 나온 물을 가지고 미량 원소를 확인하는 작업을 하고 있다고 밝힌다.
+d1-e104-local-csy-f0028,4,4,PENDING,MAJOR_EVENT,박사가 유리(Yuri)의 캡슐 재활용 시스템에서 채취한 물을 분석하여 화성 표면이나 다른 곳에서 온 흔적 성분이 있는지 조사하고 있다고 밝힘.
+d1-e104-local-csy-f0029,4,4,PENDING,REVELATION,언론을 통해 마르스 전문가인 재커리 월저(Zachary Walzer) 박사가 캐나다의 위성 추락 사건을 조사하기 위해 비밀리에 불려 들어왔다는 사실이 보도됨.
+d1-e104-local-csy-f0030,4,4,PENDING,REVELATION,뉴스 방송에서 화성 전문가인 자카리 월저 박사가 캐나다의 위성 추락 사건을 조사하기 위해 비밀리에 투입되었다는 사실이 보도된다.
+d1-e104-local-csy-f0031,4,4,PENDING,MAJOR_EVENT,"리처드 하드필드 박사가 방송 인터뷰에서 화성 탐사선이 외계 미생물이나 박테리아, 바이러스 같은 오염물질을 가져왔을 것이라고 주장한다."
+d1-e104-local-csy-f0032,4,4,PENDING,REVELATION,인물이 화성 탐사선이 지구 외 생태계를 파괴할 수 있는 미생물이나 바이러스 등의 오염물질을 가져왔을 것이라고 주장한다.
+d1-e104-local-csy-f0033,4,4,PENDING,MAJOR_EVENT,"밀러 장관이 사임하고, 에릭 매클렐런 보좌관이 국토안보부 수장으로 임명되었다고 보도된다."
+d1-e104-local-csy-f0034,4,4,PENDING,REVELATION,"밀러 국토안보부 장관이 사임하고, 에릭 매클렐런 보좌관이 후임으로 임명되었다."
+d1-e105-local-csy-f0001,5,5,PENDING,MAJOR_EVENT,알렉세이 체르토프가 기지 주변을 염탐하다가 붙잡혀 이름과 러시아인이라는 사실을 밝힌다.
+d1-e105-local-csy-f0002,5,5,PENDING,RELATIONSHIP,알렉세이 체르토프가 톰 테일러에게 자신을 월처 박사의 동료라고 주장하며 그를 만나야 한다고 말한다.
+d1-e105-local-csy-f0003,5,5,PENDING,MAJOR_EVENT,알렉세이 체르토프라는 러시아인이 군사 기지 주변을 염탐하다가 붙잡힌다.
+d1-e105-local-csy-f0004,5,5,PENDING,RELATIONSHIP,알렉세이는 자신을 월저 박사의 동료라고 주장하며 그를 만나게 해달라고 요구한다.
+d1-e105-local-csy-f0005,5,5,PENDING,MAJOR_EVENT,알렉세이는 화성에서 귀환한 소련 우주선에 관해 유용한 정보를 가지고 있다고 주장한다.
+d1-e105-local-csy-f0006,5,5,PENDING,RELATIONSHIP,월저 박사는 알렉세이가 러시아의 에네르기아 화성 프로그램에서 일했으며 12~13년 전에 만난 적이 있다고 확인해 준다.
+d1-e105-local-csy-f0007,5,5,PENDING,MAJOR_EVENT,월저 박사는 며칠 전 몇 가지 사안에 대해 조언을 구하고자 알렉세이에게 연락했다고 시인한다.
+d1-e105-local-csy-f0008,5,5,PENDING,REVELATION,테일러가 며칠 전에 다른 사람들의 의견을 구하기 위해 우주선에 대해 연락했다고 밝혔다.
+d1-e105-local-csy-f0009,5,5,PENDING,DISCOVERY,우주선이 텔레메트리를 전송했고 누군가 그것을 포착하여 알게 되었다고 설명했다.
+d1-e105-local-csy-f0010,5,5,PENDING,DISCOVERY,알렉세이가 바이코누르의 수신기에서 캡슐의 텔레메트리 데이터를 포착했다고 설명했다.
+d1-e105-local-csy-f0011,5,5,PENDING,DISCOVERY,알렉세이가 조사 과정에서 기록의 의아한 누락과 자금 및 자원의 유용을 발견했다고 주장했다.
+d1-e105-local-csy-f0012,5,5,PENDING,DISCOVERY,조사가이드는 약 30년 전의 소련 기록에서 자금과 자원이 유용되고 설명되지 않은 채 누락된 이상한 점들을 발견했다고 밝혔다.
+d1-e105-local-csy-f0013,5,5,PENDING,MAJOR_EVENT,화자는 유리(Yuri)가 깨어나면 통역을 돕고 Jane과의 관계와 무관하게 그의 말을 확인하기 위해 방에 들어가 줄 것을 요청했다.
+d1-e105-local-csy-f0014,5,5,PENDING,REVELATION,인물은 러시아 정부 소속이 아닌 민간 보안회사인 '화이트 울프 엘리트(White Wolf Elite)'라는 조직에 대해 언급했다.
+d1-e105-local-csy-f0015,5,5,PENDING,REVELATION,화이트 울프(White Wolf)는 전직 KGB 출신인 빅토르 클리멘코(Viktor Klimenko)가 2000년에 설립한 용병 기업이라고 언급되었다.
+d1-e105-local-csy-f0016,5,5,PENDING,DISCOVERY,"화이트 울프(White Wolf)가 몇 년 전에 러시아 우주국으로부터 잉여 하드웨어, 로켓, 캡슐 등 많은 물자를 구입했다고 언급되었다."
+d1-e105-local-csy-f0017,5,5,PENDING,REVELATION,클리멘코가 2000년에 새로운 러시아의 방향에 실망하여 민간 군사기업 '화이트 울프'를 설립했다고 언급된다.
+d1-e105-local-csy-f0018,5,5,PENDING,DISCOVERY,"화이트 울프가 러시아 우주국으로부터 잉여 하드웨어, 로켓, 캡슐 등의 물자를 매입했다고 언급된다."
+d1-e105-local-csy-f0019,5,5,PENDING,MAJOR_EVENT,"조사관들이 유리라고 불리는 인물을 심문하여 그의 이름, 고향, 그리고 총을 가지고 있던 이유 등에 대해 질문한다."
+d1-e105-local-csy-f0020,5,5,PENDING,REVELATION,테일러가 늑대들 때문에 총을 가지고 있었으며 부모님이 인원이 부족해서 함께 오지 못했다고 말한다.
+d1-e105-local-csy-f0021,5,5,PENDING,MAJOR_EVENT,인물들이 캡슐 내부의 물을 가스 크로마토그래프로 분석하여 화성에서 온 것인지 확인하려 한다.
+d1-e105-local-csy-f0022,5,5,PENDING,DISCOVERY,글렌이 캡슐 안에서 채취한 물의 중수소 대 수소 비율을 가스 크로마토그래프를 통해 분석하여 화성 유래 여부를 확인하려 한다고 말한다.
+d1-e105-local-csy-f0023,5,5,PENDING,REVELATION,알렉세이가 유리와 대화해 보았으나 그가 아주 많이 위축되어 있고 그다지 유용한 말을 하지 않았다고 밝힌다.
+d1-e105-local-csy-f0024,5,5,PENDING,DISCOVERY,유리가 혼자 보내진 이유에 대해 부모님과 관련된 단서가 언급된다.
+d1-e105-local-csy-f0025,5,5,PENDING,REVELATION,피에르는 백색 늑대와 추락한 캡슐 사이에 연관성이 있을 가능성이 있다고 주장한다.
+d1-e105-local-csy-f0026,5,5,PENDING,MAJOR_EVENT,러시아 측은 격리 기간이 끝나면 유리를 돌려받기를 요구하며 정부는 그를 넘겨줄 의도라고 밝힌다.
+d1-e105-local-csy-f0027,5,5,PENDING,MAJOR_EVENT,러시아 측이 격리 종료 후 그들의 남자를 돌려주기를 요청했으며 미국 측이 이를 넘겨줄 의도가 있다는 사실이 언급됨.
+d1-e105-local-csy-f0028,5,5,PENDING,MAJOR_EVENT,유리가 의사 월저의 질문에 자신은 죽었다고 대답함.
+d1-e105-local-csy-f0029,5,5,PENDING,DISCOVERY,"유리가 캡슐 내 물이 웅덩이(the pit)에서 온 것이며, 그곳에 무엇인가 산다고 진술함."
+d1-e105-local-csy-f0030,5,5,PENDING,MAJOR_EVENT,유리가 캡슐이 분리되지 않고 전체가 내려왔으며 이곳에 온 것은 사고였다고 진술함.
+d1-e105-local-csy-f0031,5,5,PENDING,MAJOR_EVENT,"캡슐이 분리되지 않고 전체가 내려왔으며, 선택을 해야 했다고 언급된다."
+d1-e105-local-csy-f0032,5,5,PENDING,REVELATION,맥클렐런이 검역(quarantine)을 내일 아침에 조기 종료할 것이라고 전해진다.
+d1-e105-local-csy-f0033,5,5,PENDING,MAJOR_EVENT,오늘 밤 유리(Yuri)를 트럭에 태워 조용히 빼돌릴 계획임이 언급된다.
+d1-e105-local-csy-f0034,5,5,PENDING,MAJOR_EVENT,"맥클렐런이 검역을 내일 아침에 조기 종료할 것이며, 유리를 트럭에 태워 조용히 빼돌릴 계획이라고 소피에게 전한다."
+d1-e105-local-csy-f0035,5,5,PENDING,MAJOR_EVENT,맥클렐런의 검역 조기 종료 및 유리 이송 계획이 백악관에서 직접 나온 지시라고 언급된다.
+d1-e105-local-csy-f0036,5,5,PENDING,MAJOR_EVENT,화성에서 온 소년이 거짓말을 하고 있을 가능성에 대한 이야기가 오간다.
+d1-e105-local-csy-f0037,5,5,PENDING,REVELATION,"검역이 내일 아침에 끝난 후, 지난 2주간 있었던 일에 대한 기자회견을 열고 소련이 1980년대에 화성에 사람들을 보냈고 그중 한 명을 회수했다는 증거를 세상에 알릴 것이라고 발표한다."
+d1-e105-local-csy-f0038,5,5,PENDING,REVELATION,"격리가 내일 끝나는 가운데, 소련이 1980년대에 화성에 사람을 보냈을지도 모른다는 증거와 그 생존자 중 한 명을 회수했다는 사실을 내일 아침 기자회견에서 세상에 알리겠다고 결정함."
+d1-e106-local-csy-f0001,6,6,PENDING,REVELATION,토마스 J. 테일러 국토안보부 몬타나 헬레나 지역 사무소장이 기자회견에서 추락한 위성이 평범한 것이 아니며 테러 조직에 의해 통제되었다고 밝혔다.
+d1-e106-local-csy-f0002,6,6,PENDING,DEATH,토마스 J. 테일러가 아침에 용의자가 스스로 목숨을 끊었다고 발표했다.
+d1-e106-local-csy-f0003,6,6,PENDING,MAJOR_EVENT,"누군가 소년을 납치해 갔으며, 폭발은 주 목표에서 시선을 돌리기 위한 양동 작전이었다는 사실이 밝혀졌다."
+d1-e106-local-csy-f0004,6,6,PENDING,MAJOR_EVENT,현장에서 백병전을 벌인 방식을 토대로 납치범들이 러시아인이라는 추정이 제기되었다.
+d1-e106-local-csy-f0005,6,6,PENDING,MAJOR_EVENT,시위대 사이에서 벌어진 몸싸움이 경비 인력을 다른 곳으로 유인하기 위한 위장 시위였음이 밝혀졌다.
+d1-e106-local-csy-f0006,6,6,PENDING,MAJOR_EVENT,캘거리가 통신이 두절(암흑 상태)되었다는 사실이 전해졌다.
+d1-e106-local-csy-f0007,6,6,PENDING,MAJOR_EVENT,"누군가 소년을 납치해 갔으며, 폭발은 주력 목표로부터 시선을 분산시키기 위한 양동 작전이었다."
+d1-e106-local-csy-f0008,6,6,PENDING,MAJOR_EVENT,근접 격투 양상을 볼 때 소년을 납치한 이들은 러시아인일 것이라고 언급된다.
+d1-e106-local-csy-f0009,6,6,PENDING,MAJOR_EVENT,알래스카의 항공교통관제소는 민간 부호를 송신하던 747기 한 대가 비행 경로를 이탈했다고 보고했다.
+d1-e106-local-csy-f0010,6,6,PENDING,MAJOR_EVENT,문제의 항공기가 대한항공 7편(Flight 00-7)으로 확인되었으며 알래스카 영공을 향해 가고 있다.
+d1-e106-local-csy-f0011,6,6,PENDING,MAJOR_EVENT,응답이 없는 해당 항공기를 요격하기 위해 캐나다 전투기(CF-18)들이 이동하고 있다.
+d1-e106-local-csy-f0012,6,6,PENDING,MAJOR_EVENT,대통령이 알래스카 영공을 향하는 대한항공 7편을 격추하라고 지시한다.
+d1-e106-local-csy-f0013,6,6,PENDING,DEATH,유리(Yuri)의 간호사인 제인(Jane)이 머리에 총상을 입고 사망한 채 발견된다.
+d1-e106-local-csy-f0014,6,6,PENDING,MAJOR_EVENT,"대통령은 알렉세이를 찾아 감금하라고 지시하고, 캘커리(Calgary)로 직접 가겠다고 말한다."
+d1-e106-local-csy-f0015,6,6,PENDING,MAJOR_EVENT,"캡슐이 완전히 파괴되었고 남겨둔 두 구의 시신도 사라졌으며, 전문가들의 소행으로 보인다고 언급된다."
+d1-e106-local-csy-f0016,6,6,PENDING,MAJOR_EVENT,미국 F-18 전투기에 의해 격추된 747기 사고와 관련해 생존자 소식이 없으며 테러 공격 여부에 대한 보도가 나온다.
+d1-e106-local-csy-f0017,6,6,PENDING,DISCOVERY,"소피 라슨은 비행기에 사람이 없었으며, 시신이나 수하물도 발견되지 않았다고 말한다."
+d1-e106-local-csy-f0018,6,6,PENDING,REVELATION,"해당 비행기가 디코이(미끼)였으며, 1983년 9월 1일에 소련 영공을 침범했다가 격추된 대한항공 7편의 비행기 번호를 사용했다고 언급된다."
+d1-e106-local-csy-f0019,6,6,PENDING,REVELATION,"소피 라슨 요장이 비행기에 아무도 없었으며, 비행기가 미끼였다고 밝혔다."
+d1-e106-local-csy-f0020,6,6,PENDING,MAJOR_EVENT,상대방은 민간인의 사망과 테러 용의자의 자폭에 대해 책임을 지고 기자들 앞에서 사과한 뒤 직위에서 사임하라고 요구했다.
+d1-e106-local-csy-f0021,6,6,PENDING,REVELATION,러시아 대사는 이번 사건이 러시아 정부의 공식적인 작전이 아니라고 주장했다.
+d1-e106-local-csy-f0022,6,6,PENDING,DISCOVERY,"콜린스는 러시아 정부와 민간 보안 회사인 화이트 울프, 그리고 빅토르 클리멘코의 연관성에 대해 언급했다."
+d1-e106-local-csy-f0023,6,6,PENDING,REVELATION,콜린스는 러시아의 민간 보안회사인 화이트 울프가 이번 사건에 연루되었을 가능성을 제기했다.
+d1-e106-local-csy-f0024,6,6,PENDING,REVELATION,콜린스는 빅토르 클레멘코를 정부의 더러운 일을 대신하는 부유한 올리고르크라고 언급했다.
+d1-e106-local-csy-f0025,6,6,PENDING,REVELATION,테일러가 민간 전문가인 화성 전문가 재커리 월저를 자문으로 데려왔음을 인정함.
+d1-e106-local-csy-f0026,6,6,PENDING,REVELATION,"캡슐에 원시 생명체의 화석 증거가 포함되어 있었으며, 1980년대에 소련이 대중에게 알리지 않고 화성에 유인 임무를 보냈다고 밝혀짐."
+d1-e106-local-csy-f0027,6,6,PENDING,IDENTITY,유리로 불린 용의자가 화성에서 보내진 두 우주비행사의 아이였다고 언급됨.
+d1-e106-local-csy-f0028,6,6,PENDING,MAJOR_EVENT,위원회는 테일러의 행동에 심각한 판단 착오가 있었으나 범죄는 아니라고 결론 내림.
+d1-e106-local-csy-f0029,6,6,PENDING,MAJOR_EVENT,테일러가 이미 사임했기 때문에 추가 조치는 필요하지 않다고 선언됨.
+d1-e106-local-csy-f0030,6,6,PENDING,RELATIONSHIP,수전에게 청혼했다고 말함.
+d1-e106-local-csy-f0031,6,6,PENDING,MAJOR_EVENT,위원회는 테일러의 캘거리 사건 처리에 중대한 판단 착오가 있었으나 범죄는 아니라고 결론 내리고 추가 조치는 없다고 선언한다.
+d1-e106-local-csy-f0032,6,6,PENDING,RELATIONSHIP,테일러가 수잔에게 청혼했다고 밝힌다.
+d1-e106-local-csy-f0033,6,6,PENDING,DISCOVERY,테일러가 화성에서 자란 아이 같은 존재를 목격했다고 언급한다.
+d1-e106-local-csy-f0034,6,6,PENDING,REVELATION,프랭크는 소련이 화성에 사람들을 고립시켰다는 가설을 조사하기 위해 정보계 서클을 통해 알아봤으나 거의 아무것도 찾지 못하고 이름 하나만 건졌다고 밝혔다.
+d1-e106-local-csy-f0035,6,6,PENDING,RELATIONSHIP,"인물이 그녀를 그런 상황에 처하게 만들었다며 그에게 책임을 묻고, 그녀가 그를 믿었다고 말한다."
+d1-e106-local-csy-f0036,6,6,PENDING,DISCOVERY,코넬 대학의 동료와 통화하여 사람의 혈액 속 중수소 농도를 확인하는 방법에 대해 이야기했다고 말한다.
+d1-e106-local-csy-f0037,6,6,PENDING,DISCOVERY,유리의 혈액을 검사했다면 찾던 것을 발견했을 것이라고 언급한다.
+d1-e106-local-csy-f0038,6,6,PENDING,RELATIONSHIP,그녀가 자신의 작업에 대해 괜찮아하다가 자신이 집착한다고 말했다고 회상한다.
+d1-e106-local-csy-f0039,6,6,PENDING,MAJOR_EVENT,유리를 찾는 방법을 알 수도 있다며 우크라이나에 소비에트 임무와 관련되었을 수 있는 사람이 있다고 언급한다.
+d1-e106-local-csy-f0040,6,6,PENDING,REVELATION,유리를 찾을 수 있는 방법이 있을지 모른다고 말하며 우크라이나에 있는 소련 임무 관련 연루자를 만나러 가자고 제안한다.
+d1-e106-local-csy-f0041,6,6,PENDING,RELATIONSHIP,한 인물이 다른 인물에게 함께 가자고 제안한다.
+d1-e106-local-csy-f0042,6,6,PENDING,MAJOR_EVENT,한 인물이 그를 찾으려고 노력해야 한다고 말한다.
+d1-e106-local-csy-f0043,6,6,PENDING,RELATIONSHIP,한 인물이 다시는 손대지 말라는 조건을 제시한다.

@@ -1,0 +1,118 @@
+{
+  "total": 1118,
+  "viewers": {
+    "2": {
+      "ok": 1038,
+      "leak": 49,
+      "overblock": 31,
+      "must_hide": 555,
+      "may_show": 563,
+      "leak_rate": 8.8,
+      "overblock_rate": 5.5,
+      "accuracy": 92.8
+    },
+    "4": {
+      "ok": 1056,
+      "leak": 32,
+      "overblock": 30,
+      "must_hide": 325,
+      "may_show": 793,
+      "leak_rate": 9.8,
+      "overblock_rate": 3.8,
+      "accuracy": 94.5
+    },
+    "6": {
+      "ok": 1104,
+      "leak": 0,
+      "overblock": 14,
+      "must_hide": 0,
+      "may_show": 1118,
+      "leak_rate": null,
+      "overblock_rate": 1.3,
+      "accuracy": 98.7
+    }
+  },
+  "categories": {
+    "B": {
+      "name": "바꿔 말하기·별명",
+      "count": 437,
+      "expected": "SPOILER",
+      "ok_rate": 98.4,
+      "leak": 7,
+      "overblock": 14
+    },
+    "C": {
+      "name": "감정에 섞인 사실",
+      "count": 217,
+      "expected": "SPOILER",
+      "ok_rate": 93.4,
+      "leak": 26,
+      "overblock": 17
+    },
+    "D": {
+      "name": "부분 언급·암시",
+      "count": 217,
+      "expected": "SPOILER",
+      "ok_rate": 90.9,
+      "leak": 48,
+      "overblock": 11
+    },
+    "E1": {
+      "name": "추측(틀림)",
+      "count": 7,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0
+    },
+    "E2": {
+      "name": "추측(맞음)",
+      "count": 217,
+      "expected": "SAFE",
+      "ok_rate": 94.9,
+      "leak": 0,
+      "overblock": 33
+    },
+    "F": {
+      "name": "내용 없는 반응",
+      "count": 8,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0
+    },
+    "G": {
+      "name": "일상·무관",
+      "count": 8,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0
+    },
+    "H": {
+      "name": "함정(같은 단어)",
+      "count": 7,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0
+    }
+  },
+  "judge": {
+    "spoilers": 871,
+    "match_rate": 90.7,
+    "hidden_rate": 91.4,
+    "exact_episode_rate": 88.3,
+    "event_id_rate": 86.7,
+    "safe": 247,
+    "safe_published_rate": 80.2,
+    "verdicts": {
+      "MATCH": 837,
+      "NO_MATCH": 274,
+      "ERROR": 7
+    },
+    "avg_ms": 1271,
+    "max_ms": 8067
+  },
+  "stability": null
+}
