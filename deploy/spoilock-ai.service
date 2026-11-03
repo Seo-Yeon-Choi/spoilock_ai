@@ -1,0 +1,17 @@
+[Unit]
+Description=SPOILOCK AI server (FastAPI)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/opt/spoilock-ai
+EnvironmentFile=/opt/spoilock-ai/.env
+# 작업 큐와 Chroma 가 프로세스 안에 있으므로 worker 는 반드시 1개
+ExecStart=/opt/spoilock-ai/.venv/bin/python -m uvicorn spoiler_server:app --host 0.0.0.0 --port 8000 --workers 1
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+# SPOILOCK AI 서버 (EC2, CPU 전용)
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+python-dotenv
+chromadb
+sentence-transformers
+google-genai
+faster-whisper
