@@ -83,6 +83,14 @@ def create_event(req: CreateEventRequest, x_admin_token: str | None = Header(Non
                  description=req.description, event_type=req.event_type, fact_status=req.fact_status)
 
 
+@router.get("/admin/events/{event_id}")
+def get_event(event_id: str, x_admin_token: str | None = Header(None)):
+    """사건 1건 조회. Spring 이 검수·수정·삭제 전에 '삭제된 작품의 사건인지' 확인할 때 사용"""
+    _check_token(x_admin_token)
+    document, meta = _call(admin.get_event, _res()["col"], event_id)
+    return admin.to_public(event_id, document, meta)
+
+
 @router.patch("/admin/events/{event_id}")
 def update_event(event_id: str, req: UpdateEventRequest, x_admin_token: str | None = Header(None)):
     _check_token(x_admin_token)
