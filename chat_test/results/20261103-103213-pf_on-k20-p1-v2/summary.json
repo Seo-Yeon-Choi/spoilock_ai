@@ -1,0 +1,240 @@
+{
+  "total": 100,
+  "viewers": {
+    "0": {
+      "ok": 90,
+      "leak": 9,
+      "overblock": 1,
+      "must_hide": 59,
+      "may_show": 41,
+      "leak_rate": 15.3,
+      "overblock_rate": 2.4,
+      "accuracy": 90.0
+    },
+    "2": {
+      "ok": 87,
+      "leak": 10,
+      "overblock": 3,
+      "must_hide": 43,
+      "may_show": 57,
+      "leak_rate": 23.3,
+      "overblock_rate": 5.3,
+      "accuracy": 87.0
+    },
+    "4": {
+      "ok": 91,
+      "leak": 5,
+      "overblock": 4,
+      "must_hide": 22,
+      "may_show": 78,
+      "leak_rate": 22.7,
+      "overblock_rate": 5.1,
+      "accuracy": 91.0
+    },
+    "6": {
+      "ok": 94,
+      "leak": 0,
+      "overblock": 6,
+      "must_hide": 0,
+      "may_show": 100,
+      "leak_rate": null,
+      "overblock_rate": 6.0,
+      "accuracy": 94.0
+    }
+  },
+  "categories": {
+    "B": {
+      "name": "바꿔 말하기·별명",
+      "count": 17,
+      "expected": "SPOILER",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1169,
+      "gemini_calls": 17
+    },
+    "C": {
+      "name": "감정에 섞인 사실",
+      "count": 19,
+      "expected": "SPOILER",
+      "ok_rate": 82.9,
+      "leak": 7,
+      "overblock": 6,
+      "avg_ms": 1142,
+      "gemini_calls": 19
+    },
+    "D": {
+      "name": "부분 언급·암시",
+      "count": 23,
+      "expected": "SPOILER",
+      "ok_rate": 77.2,
+      "leak": 17,
+      "overblock": 4,
+      "avg_ms": 1110,
+      "gemini_calls": 23
+    },
+    "E1": {
+      "name": "추측(틀림)",
+      "count": 6,
+      "expected": "SAFE",
+      "ok_rate": 83.3,
+      "leak": 0,
+      "overblock": 4,
+      "avg_ms": 1116,
+      "gemini_calls": 6
+    },
+    "E2": {
+      "name": "추측(맞음)",
+      "count": 7,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1115,
+      "gemini_calls": 7
+    },
+    "F": {
+      "name": "내용 없는 반응",
+      "count": 8,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1073,
+      "gemini_calls": 8
+    },
+    "G": {
+      "name": "일상·무관",
+      "count": 11,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 725,
+      "gemini_calls": 7
+    },
+    "H": {
+      "name": "함정(같은 단어)",
+      "count": 9,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1038,
+      "gemini_calls": 9
+    }
+  },
+  "judge": {
+    "spoilers": 59,
+    "match_rate": 76.3,
+    "hidden_rate": 84.7,
+    "exact_episode_rate": 64.4,
+    "event_id_rate": 62.7,
+    "safe": 41,
+    "safe_published_rate": 97.6,
+    "verdicts": {
+      "UNCERTAIN": 6,
+      "MATCH": 45,
+      "NO_MATCH": 45,
+      "SKIPPED_GENERAL": 4
+    },
+    "avg_ms": 1075,
+    "max_ms": 1651,
+    "gemini_calls": 96,
+    "skipped_avg_ms": 48,
+    "gemini_avg_ms": 1118
+  },
+  "stability": null,
+  "groups": {
+    "E2_HIDDEN": {
+      "count": 3,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1141,
+      "gemini_calls": 3
+    },
+    "E2_SHOWN": {
+      "count": 3,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1093,
+      "gemini_calls": 3
+    },
+    "ERROR_ID": {
+      "count": 4,
+      "expected": "SPOILER",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1086,
+      "gemini_calls": 4
+    },
+    "HARD_LEAK": {
+      "count": 22,
+      "expected": "SPOILER",
+      "ok_rate": 73.9,
+      "leak": 19,
+      "overblock": 4,
+      "avg_ms": 1147,
+      "gemini_calls": 22
+    },
+    "OVERBLOCK": {
+      "count": 6,
+      "expected": "SPOILER",
+      "ok_rate": 79.2,
+      "leak": 0,
+      "overblock": 5,
+      "avg_ms": 1172,
+      "gemini_calls": 6
+    },
+    "PREFILTER_SKIP": {
+      "count": 3,
+      "expected": "SPOILER",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1106,
+      "gemini_calls": 3
+    },
+    "REGRESSION": {
+      "count": 20,
+      "expected": "SPOILER",
+      "ok_rate": 93.8,
+      "leak": 5,
+      "overblock": 0,
+      "avg_ms": 1142,
+      "gemini_calls": 20
+    },
+    "SAFE_AI": {
+      "count": 20,
+      "expected": "SAFE",
+      "ok_rate": 95.0,
+      "leak": 0,
+      "overblock": 4,
+      "avg_ms": 1015,
+      "gemini_calls": 19
+    },
+    "SAFE_REAL": {
+      "count": 14,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 879,
+      "gemini_calls": 11
+    },
+    "UNSTABLE": {
+      "count": 5,
+      "expected": "SPOILER",
+      "ok_rate": 95.0,
+      "leak": 0,
+      "overblock": 1,
+      "avg_ms": 1087,
+      "gemini_calls": 5
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "total": 27,
+  "viewers": {
+    "1": {
+      "ok": 26,
+      "leak": 0,
+      "overblock": 1,
+      "must_hide": 7,
+      "may_show": 20,
+      "leak_rate": 0.0,
+      "overblock_rate": 5.0,
+      "accuracy": 96.3
+    },
+    "2": {
+      "ok": 26,
+      "leak": 0,
+      "overblock": 1,
+      "must_hide": 0,
+      "may_show": 27,
+      "leak_rate": null,
+      "overblock_rate": 3.7,
+      "accuracy": 96.3
+    }
+  },
+  "categories": {
+    "B": {
+      "name": "바꿔 말하기·별명",
+      "count": 6,
+      "expected": "SPOILER",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1290,
+      "gemini_calls": 6
+    },
+    "C": {
+      "name": "감정에 섞인 사실",
+      "count": 4,
+      "expected": "SPOILER",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1118,
+      "gemini_calls": 4
+    },
+    "D": {
+      "name": "부분 언급·암시",
+      "count": 6,
+      "expected": "SPOILER",
+      "ok_rate": 83.3,
+      "leak": 0,
+      "overblock": 2,
+      "avg_ms": 1077,
+      "gemini_calls": 6
+    },
+    "E1": {
+      "name": "추측(틀림)",
+      "count": 3,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1420,
+      "gemini_calls": 3
+    },
+    "E2": {
+      "name": "추측(맞음)",
+      "count": 2,
+      "expected": "GUESS",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1041,
+      "gemini_calls": 2
+    },
+    "F": {
+      "name": "내용 없는 반응",
+      "count": 2,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1204,
+      "gemini_calls": 2
+    },
+    "G": {
+      "name": "일상·무관",
+      "count": 2,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 996,
+      "gemini_calls": 2
+    },
+    "H": {
+      "name": "함정(같은 단어)",
+      "count": 2,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1254,
+      "gemini_calls": 2
+    }
+  },
+  "judge": {
+    "spoilers": 16,
+    "match_rate": 87.5,
+    "hidden_rate": 93.8,
+    "exact_episode_rate": 87.5,
+    "event_id_rate": null,
+    "safe": 9,
+    "safe_published_rate": 100.0,
+    "verdicts": {
+      "NO_MATCH": 12,
+      "MATCH": 14,
+      "UNCERTAIN": 1
+    },
+    "avg_ms": 1182,
+    "max_ms": 1519,
+    "gemini_calls": 27,
+    "skipped_avg_ms": null,
+    "gemini_avg_ms": 1182
+  },
+  "stability": null,
+  "groups": {
+    "1화 본 작성자": {
+      "count": 1,
+      "expected": "GUESS",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1100,
+      "gemini_calls": 1
+    },
+    "미시청 작성자": {
+      "count": 1,
+      "expected": "GUESS",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 982,
+      "gemini_calls": 1
+    },
+    "실제 채팅": {
+      "count": 6,
+      "expected": "SAFE",
+      "ok_rate": 100.0,
+      "leak": 0,
+      "overblock": 0,
+      "avg_ms": 1211,
+      "gemini_calls": 6
+    },
+    "실제 채팅(새던 문장)": {
+      "count": 4,
+      "expected": "SPOILER",
+      "ok_rate": 75.0,
+      "leak": 0,
+      "overblock": 2,
+      "avg_ms": 1092,
+      "gemini_calls": 4
+    }
+  }
+}

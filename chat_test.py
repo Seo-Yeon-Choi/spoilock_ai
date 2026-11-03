@@ -32,6 +32,9 @@ cases.csv 열
   expected: SPOILER      등록된 사건을 드러냄 (episode = 공개 회차)
             SAFE         누구에게나 보여도 됨
             UNREGISTERED 실제 줄거리지만 사건 목록에 없음 (episode = 실제 공개 회차)
+            GUESS        사건과 맞는 추측·질문 (episode = 사건 공개 회차)
+                         작성자가 그 회차를 봤으면(author_episode ≥ episode) SPOILER, 아니면 SAFE 로 채점
+  author_episode: 작성자의 시청 회차 (비우면 --author-episode 값, 기본 없음 = 진도 모름)
 """
 import argparse
 import csv
@@ -48,8 +51,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 OUT_DIR = ROOT / "chat_test"
-CASE_FIELDS = ["id", "category", "message", "expected", "episode", "event_id", "source", "note"]
-EXPECTED = ("SPOILER", "SAFE", "UNREGISTERED")
+CASE_FIELDS = ["id", "category", "message", "expected", "episode", "event_id", "source", "note", "author_episode"]
+EXPECTED = ("SPOILER", "SAFE", "UNREGISTERED", "GUESS")
 
 CATEGORY_NAMES = {
     "A": "사건 직접 언급",
@@ -287,9 +290,39 @@ class Policy:
         self.publish_off_topic = True
         self.publish_skipped_general = True
         self.publish_skipped_unrelated = False
+        self.author_guess = not getattr(args, "no_author_guess", False)
+        # Spring app.spoiler.hold-as-finale=true: 보류 → 드라마 마지막 회차(색인 최대 회차)부터 공개
+        self.hold_as_finale = not getattr(args, "no_finale", False)
 
-    def decide(self, r, indexed):
-        """반환: ("ALL", None) 모두 공개 / ("FROM", n) n화 이상 공개 / ("HOLD", 이유) / ("FAIL", 이유)"""
+    def decide(self, r, indexed, author=None):
+        """반환: ("ALL", None) 모두 공개 / ("FROM", n) n화 이상 공개 / ("HOLD", 이유) / ("FAIL", 이유)
+        author: 작성자 시청 회차. Spring 과 같이 '작성자가 이미 본 회차의 추측'이면 그 회차부터 공개"""
+        decision = self._decide_verdict(r, indexed)
+        if self.author_guess:
+            decision = self._apply_author_guess(decision, r, indexed, author)
+        if self.hold_as_finale and decision[0] == "HOLD" and indexed:
+            return "FROM", max(indexed)
+        return decision
+
+    def _apply_author_guess(self, decision, r, indexed, author):
+        eps = [e for e in (r.get("guess_episodes") or []) if e and e > 0 and e in indexed]
+        if decision[0] == "FAIL" or author is None or not eps:
+            return decision
+        author = max(0, author)
+        known = max((e for e in eps if e <= author), default=None)
+        if known is None:
+            # 안 본 회차 추측 = 모르고 하는 추측 → 전체 공개 (MATCH 는 그대로)
+            return decision if r.get("analysis_verdict") == "MATCH" else ("ALL", None)
+        unverified = not r.get("guess_basis") or str(r["guess_basis"]).startswith("UNVERIFIED")
+        if unverified and not self.allow_unverified:
+            return ("HOLD", "작성자가 본 회차의 추측(미검증 사건)") if decision[0] in ("ALL", "FROM") else decision
+        if decision[0] == "HOLD":
+            return ("FROM", known) if r.get("analysis_verdict") == "NO_MATCH" else decision
+        if decision[0] == "FROM" and decision[1] >= known:
+            return decision
+        return "FROM", known
+
+    def _decide_verdict(self, r, indexed):
         v = r.get("analysis_verdict")
         if v == "MATCH":
             ep = r.get("required_episode_number")
@@ -322,7 +355,9 @@ class Policy:
     def describe(self):
         return (f"미검수 사건 판정 {'허용' if self.allow_unverified else '보류'}, "
                 f"NO_MATCH {'공개' if self.publish_no_match else '보류(드라마 무관 대화만 공개)'}, "
-                f"1차 필터 일반 대화 공개 / 사건 무관 보류")
+                f"1차 필터 일반 대화 공개 / 사건 무관 보류, "
+                f"작성자 진도 추측 판단 {'켬' if self.author_guess else '끔'}, "
+                f"보류 → {'마지막 회차부터 공개' if self.hold_as_finale else '영구 보류'}")
 
 
 def visible(decision, viewer):
@@ -334,11 +369,25 @@ def visible(decision, viewer):
     return False          # HOLD / FAIL → 아무에게도 안 보임 (작성자 본인 제외)
 
 
+def author_of(case):
+    a = str(case.get("author_episode") or "").strip()
+    return int(a) if a.isdigit() else None
+
+
+def effective_expected(case):
+    """GUESS 는 작성자 진도에 따라 SPOILER 또는 SAFE"""
+    exp = case["expected"]
+    ep = int(case["episode"]) if str(case.get("episode") or "").strip() else 0
+    if exp == "GUESS":
+        author = author_of(case)
+        return ("SPOILER", ep) if author is not None and author >= ep else ("SAFE", 0)
+    return exp, ep
+
+
 def grade(case, decision, viewer):
     """OK / LEAK(보이면 안 되는데 보임) / OVERBLOCK(보여도 되는데 가려짐) / HOLD_OK"""
     shown = visible(decision, viewer)
-    exp = case["expected"]
-    ep = int(case["episode"]) if str(case.get("episode") or "").strip() else 0
+    exp, ep = effective_expected(case)
     if exp == "SAFE":
         return "OK" if shown else "OVERBLOCK"
     should_hide = viewer < ep
@@ -359,15 +408,20 @@ def validate_cases(cases):
             problems.append(f"{c.get('id')}: 메시지가 비어 있음")
         if c["expected"] not in EXPECTED:
             problems.append(f"{c.get('id')}: expected 는 {'/'.join(EXPECTED)} 중 하나")
-        if c["expected"] in ("SPOILER", "UNREGISTERED") and not str(c.get("episode") or "").strip().isdigit():
+        if c["expected"] in ("SPOILER", "UNREGISTERED", "GUESS") and not str(c.get("episode") or "").strip().isdigit():
             problems.append(f"{c.get('id')}: {c['expected']} 는 episode(공개 회차)가 필요")
+        a = str(c.get("author_episode") or "").strip()
+        if a and not a.isdigit():
+            problems.append(f"{c.get('id')}: author_episode 는 숫자")
     if problems:
         raise SystemExit("cases.csv 확인 필요:\n  " + "\n  ".join(problems[:20]))
 
 
 RESULT_FIELDS = ["run", "verdict", "decision", "decision_kind", "decision_episode", "required_episode",
                  "episode_basis", "needs_review", "matched_event_id", "matched_event_ids", "matched_description",
-                 "about_story", "reason", "prefilter_stage", "prefilter_sim", "match_cache", "ms"]
+                 "about_story", "stance", "shared_fact", "guess_episodes", "guess_description", "reason",
+                 "prefilter_stage",
+                 "prefilter_sim", "match_cache", "ms"]
 
 
 def _is_quota(r):
@@ -385,7 +439,7 @@ def _used_gemini(r):
 
 
 def build_row(c, rep, r, ms, policy, viewers, indexed):
-    decision = policy.decide(r, indexed)
+    decision = policy.decide(r, indexed, author_of(c))
     pf = r.get("prefilter") or {}
     row = {
         **{k: c.get(k, "") for k in CASE_FIELDS}, "run": rep,
@@ -402,6 +456,12 @@ def build_row(c, rep, r, ms, policy, viewers, indexed):
         "matched_event_ids": ";".join(r.get("matched_event_ids") or []),
         "matched_description": r.get("matched_event_description") or "",
         "about_story": r.get("about_story"),
+        # v2: 말하는 방식. 코드가 바로잡았으면 "guess(모델:fact)" 처럼 표시
+        "stance": (r.get("stance") or "") + (
+            f'(모델:{r.get("stance_model")})' if r.get("stance_model") and r.get("stance_model") != r.get("stance") else ""),
+        "shared_fact": r.get("shared_fact") or "",
+        "guess_episodes": ";".join(str(e) for e in (r.get("guess_episodes") or [])),
+        "guess_description": " / ".join(r.get("guess_event_descriptions") or []),
         "reason": r.get("reason") or r.get("error") or "",
         "prefilter_stage": (f'{pf.get("decision", "")} ({pf.get("stage", "")})' if pf else ""),
         "prefilter_sim": pf.get("best_sim") if pf.get("best_sim") is not None else "",
@@ -427,6 +487,7 @@ def load_raw(out):
 def finish(out, rows, viewers, policy, args, health, suffix=""):
     meta = {"server": args.server, "model": health.get("gemini_model"), "drama": args.drama, "kb": args.kb,
             "episodes": f"{args.episodes[0]}-{args.episodes[-1]}", "prefilter": args.prefilter, "top_k": args.top_k,
+            "prompt_version": getattr(args, "prompt_version", "") or "server",
             "repeat": args.repeat, "policy": policy.describe(), "cases": str(args.cases),
             "at": out.name}
     fields = CASE_FIELDS + RESULT_FIELDS + [f"v{v}" for v in viewers]
@@ -478,6 +539,10 @@ def cmd_run(args):
         for i, c in enumerate(cases, 1):
             c["id"] = (c.get("id") or "").strip() or f"C{i:03d}"
         validate_cases(cases)
+        if args.author_episode is not None:
+            for c in cases:
+                if not str(c.get("author_episode") or "").strip():
+                    c["author_episode"] = str(args.author_episode)
         if args.sample:
             cases = sample_cases(cases, args.sample, args.seed)
         if args.limit:
@@ -523,6 +588,8 @@ def cmd_run(args):
                     "reason_mode": "short", "prefilter_mode": args.prefilter,
                     "refresh": not args.use_cache, "debug": True,
                 }
+                if args.prompt_version:
+                    body["prompt_version"] = args.prompt_version
                 for attempt in range(1, args.retries + 2):
                     wait = interval - (time.monotonic() - last_call)
                     if wait > 0:
@@ -591,7 +658,8 @@ def cmd_rescore(args):
                       policy, viewers, args.episodes)
             for c in cases for rep in range(1, args.repeat + 1) if (c["id"], rep) in done]
     suffix = "_" + ("nomatch-publish" if args.publish_no_match else "nomatch-hold") \
-             + ("_no-unverified" if args.no_unverified else "")
+             + ("_no-unverified" if args.no_unverified else "") \
+             + ("_no-author-guess" if args.no_author_guess else "")
     print(f"정책: {policy.describe()}")
     finish(out, rows, viewers, policy, args, {"gemini_model": None}, suffix)
 
@@ -614,9 +682,9 @@ def summarize(rows, viewers):
     s = {"total": len(rows), "viewers": {}, "categories": {}, "judge": {}, "stability": None}
     for v in viewers:
         g = Counter(r[f"v{v}"] for r in rows)
-        must_hide = sum(1 for r in rows if r["expected"] != "SAFE" and v < int(r["episode"] or 0))
-        may_show = sum(1 for r in rows if r["expected"] == "SAFE"
-                       or (r["expected"] == "SPOILER" and v >= int(r["episode"] or 0)))
+        eff = [effective_expected(r) for r in rows]
+        must_hide = sum(1 for exp, ep in eff if exp != "SAFE" and v < ep)
+        may_show = sum(1 for exp, ep in eff if exp == "SAFE" or (exp == "SPOILER" and v >= ep))
         s["viewers"][v] = {
             "ok": g["OK"] + g["HOLD_OK"], "leak": g["LEAK"], "overblock": g["OVERBLOCK"],
             "must_hide": must_hide, "may_show": may_show,
@@ -645,6 +713,7 @@ def summarize(rows, viewers):
         if (r.get("note") or "").strip():
             by_note[r["note"].strip()].append(r)
     s["groups"] = {k: group_stats(v) for k, v in sorted(by_note.items())} if len(by_note) <= 20 else {}
+    # 추측(GUESS) 문장은 작성자 진도에 따라 정답이 바뀌므로 판정 품질 지표에서는 제외
     spoilers = [r for r in rows if r["expected"] == "SPOILER"]
     matched = [r for r in spoilers if r["decision_kind"] == "FROM"]
     hidden = [r for r in spoilers if r["decision_kind"] in ("FROM", "HOLD")]
@@ -734,7 +803,9 @@ def render_report(rows, s, viewers, meta):
                        for c, x in s["categories"].items())
     group_names = {"HARD_LEAK": "계속 새던 스포", "PREFILTER_SKIP": "1차 필터가 넘긴 스포",
                    "UNSTABLE": "실행마다 결과 다름", "ERROR_ID": "사건 ID 오류", "OVERBLOCK": "과잉 차단",
-                   "E2_HIDDEN": "맞는 추측(가려짐)", "E2_SHOWN": "맞는 추측(공개)", "REGRESSION": "잘 되던 스포",
+                   "E2_HIDDEN": "맞는 추측(가려짐)", "E2_SHOWN": "맞는 추측(공개)",
+                   "GUESS_KNOWN": "이미 본 회차를 추측처럼", "GUESS_UNKNOWN": "안 본 회차 추측",
+                   "RELABELED": "정답 수정(스포 아님)", "REGRESSION": "잘 되던 스포",
                    "SAFE_AI": "스포 아님(AI 작성)", "SAFE_REAL": "스포 아님(실제 말투)"}
     group_html = ""
     if s.get("groups"):
@@ -749,7 +820,13 @@ def render_report(rows, s, viewers, meta):
         grades = "".join(f"<td>{badge(r[f'v{v}'])}</td>" for v in viewers)
         bad = any(r[f"v{v}"] in ("LEAK", "OVERBLOCK") for v in viewers)
         exp = r["expected"] + (f' · {r["episode"]}화' if r["episode"] else "")
+        if author_of(r) is not None:
+            exp += f' · 작성자 {author_of(r)}화'
+            if r["expected"] == "GUESS":
+                exp += " → " + effective_expected(r)[0]
         detail = e(r["reason"] or "")
+        if r.get("guess_description"):
+            detail += f'<div class="m">추측 사건: {e(r["guess_description"])}</div>'
         if r["matched_description"]:
             detail += f'<div class="m">매칭: {e(r["matched_description"])}</div>'
         if r["prefilter_stage"]:
@@ -812,6 +889,8 @@ def main(argv=None):
     p.add_argument("--viewers", default="2,4,6")
     p.add_argument("--prefilter", default="on", choices=["on", "off", "shadow"])
     p.add_argument("--top-k", type=int, default=20, help="Gemini 에 보여줄 후보 사건 수 (Spring 기본 20)")
+    p.add_argument("--prompt-version", default="", choices=["", "v1", "v2"],
+                   help="판정 프롬프트 버전 (비우면 서버 설정 PROMPT_VERSION). v1/v2 비교용")
     p.add_argument("--tag", default="", help="결과 폴더 이름에 붙일 메모 (예: prompt2)")
     p.add_argument("--repeat", type=int, default=1)
     p.add_argument("--limit", type=int, default=0)
@@ -819,7 +898,13 @@ def main(argv=None):
     p.add_argument("--seed", type=int, default=1, help="--sample 고정값 (같으면 같은 문장)")
     p.add_argument("--sleep", type=float, default=0.0, help="요청 사이 대기(초)")
     p.add_argument("--publish-no-match", action="store_true")
+    p.add_argument("--no-finale", action="store_true",
+                   help="보류를 마지막 회차 공개로 바꾸지 않음 (Spring hold-as-finale=false 와 같음)")
     p.add_argument("--no-unverified", action="store_true")
+    p.add_argument("--author-episode", type=int, default=None,
+                   help="author_episode 가 빈 문장의 작성자 시청 회차 (기본: 모름)")
+    p.add_argument("--no-author-guess", action="store_true",
+                   help="작성자 진도로 추측을 판단하지 않음 (이전 정책과 비교용)")
     p.add_argument("--rpm", type=float, default=14, help="Gemini 분당 호출 제한 (0 = 제한 없음)")
     p.add_argument("--retries", type=int, default=3, help="한도 초과 시 다시 시도 횟수")
     p.add_argument("--quota-wait", type=int, default=65, help="한도 초과 시 대기(초)")
