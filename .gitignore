@@ -30,3 +30,7 @@ hf_cache/
 # 로그
 *.log
 logs/
+
+# 채팅 테스트 도구 (로컬 전용)
+chat_test.py
+chat_test/

@@ -1,2 +1,0 @@
-{"id": "AI766", "run": 1, "ms": 2024, "response": {"analysis_verdict": "ERROR", "error": "http://127.0.0.1:8000/judge 에 연결할 수 없습니다. Python 서버가 켜져 있나요? ([WinError 10061] 대상 컴퓨터에서 연결을 거부했으므로 연결하지 못했습니다)"}}
-{"id": "AI926", "run": 1, "ms": 2009, "response": {"analysis_verdict": "ERROR", "error": "http://127.0.0.1:8000/judge 에 연결할 수 없습니다. Python 서버가 켜져 있나요? ([WinError 10061] 대상 컴퓨터에서 연결을 거부했으므로 연결하지 못했습니다)"}}

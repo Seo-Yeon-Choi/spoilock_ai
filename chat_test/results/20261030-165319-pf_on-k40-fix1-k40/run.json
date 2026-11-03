@@ -1,1 +1,0 @@
-{"drama": 1, "kb": "local-csy", "prefilter": "on", "repeat": 1, "cases": "chat_test\\cases_100.csv", "episodes": [1, 2, 3, 4, 5, 6], "use_cache": false, "top_k": 40}
