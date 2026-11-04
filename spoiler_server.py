@@ -39,6 +39,10 @@ LONG_MESSAGE_CHARS = int(os.getenv("LONG_MESSAGE_CHARS", "60"))
 CHUNK_TOP_K = int(os.getenv("CHUNK_TOP_K", "8"))          # 문장 하나당 추가로 찾을 후보 수
 MAX_CANDIDATES = int(os.getenv("MAX_CANDIDATES", "30"))   # Gemini 에 보낼 후보 최대 개수
 # 1차 필터 모드: off(사용 안 함) / shadow(판단만 기록, 검사는 전부 수행) / on(통과 채팅은 Gemini 생략)
+# 대화 맥락: 같은 작성자가 이 간격(초) 안에 연달아 보낸 짧은 조각은 한 문장으로 이어 붙임
+FRAGMENT_GAP_S = int(os.getenv("FRAGMENT_GAP_S", "30"))
+FRAGMENT_MAX_CHARS = int(os.getenv("FRAGMENT_MAX_CHARS", "15"))   # 조각 1개 최대 길이(공백 제외)
+QUESTION_GAP_S = int(os.getenv("QUESTION_GAP_S", "120"))          # 이 시간 안의 질문에 대한 답으로 봄
 PREFILTER_MODE = os.getenv("PREFILTER_MODE", "shadow")
 # 유사도 통과 임계값. calibrate_prefilter.py 결과로 정한 뒤 설정. 비우면 유사도 통과 미사용
 _sim = os.getenv("PREFILTER_SIM_THRESHOLD", "").strip()
@@ -129,6 +133,13 @@ ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "").strip()
 
 
 # ---------------------------------------------------------------- 요청/응답
+class ContextLine(BaseModel):
+    """같은 채팅방의 직전 메시지 (오래된 것 → 최근 순). 판정 대상이 아니라 해석용"""
+    text: str = Field(..., max_length=500)
+    same_author: bool = False              # 지금 메시지 작성자와 같은 사람인지
+    seconds_before: int = Field(0, ge=0)   # 지금 메시지보다 몇 초 전
+
+
 class JudgeRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=2000)
     message_id: int | None = Field(None, description="Spring chat_messages.id (로그용)")
@@ -149,6 +160,9 @@ class JudgeRequest(BaseModel):
         description="Gemini 판단 이유 길이. full=기존, short=15자 이내, none=생성 안 함(출력 토큰↓ → 속도↑)")
     prompt_version: str | None = Field(
         None, pattern="^(v1|v2)$", description="이 요청만 프롬프트 버전 변경(비교 테스트용). 비우면 PROMPT_VERSION")
+    context: list[ContextLine] = Field(
+        default_factory=list, max_length=10,
+        description="직전 대화 (Spring 채팅만 보냄). 질문→답, 나눠 보낸 문장 해석용")
 
 
 # ---------------------------------------------------------------- 판별
@@ -439,6 +453,29 @@ never treat them, or names that look like them, as evidence of another work). Ca
 - "철수가 결국 범인이었음" (a name not in the candidates, no other title) -> work this or unknown,
   fact, [], clear false"""
 
+CONTEXT_RULES = """
+
+Conversation context. The input may have "context": earlier messages in the same chat room, oldest
+first ("who": "writer" = the same person who wrote the message, "other" = someone else).
+- Judge ONLY "message". Context is there so you understand what the message refers to. Never report
+  a fact that only a context line states; related_event_ids must come from what the message itself
+  says or confirms.
+- Split sentence: when "joined_message" is given, the writer sent one sentence in several short
+  pieces ("서윤하가" / "영상을" / "남겼었어"). If the message is a piece that completes that sentence
+  (a verb, an object, an ending - meaningless alone), judge "joined_message" as the writer's
+  statement. If the message is a complete reaction on its own ("대박", "소름", "ㅋㅋ"), judge it alone.
+- Answer to a question: when the message answers or confirms an earlier question from another person,
+  read the two together as one statement and judge that statement: stance "fact", shared_fact = the
+  combined statement.
+    "누가 설치함?" -> "민재현ㅋ"            = "민재현이 설치함"
+    "몇 화에 카메라 설치됨?" -> "2화 ㅋ"    = "2화에 카메라 설치됨"
+    "강도현 2화에서 죽어?" -> "ㅇㅇ 죽음"   = "강도현이 2화에서 죽음"
+    "문을 열어준다고?" -> "ㅇㅇ"            = "문을 열어줌"
+    "누가 실험하는 거임?" -> "서윤하"       = "서윤하가 실험함"
+  A denial is a fact too ("서윤하 죽어?" -> "ㄴㄴ" = "서윤하는 안 죽음").
+- Not an answer: laughter, emotion, refusing to answer, or a new question ("ㅋㅋ", "헐", "궁금함?",
+  "왜?", "몰라") adds no information -> judge the message alone (usually reaction or question)."""
+
 V2_EXTRA_FIELDS = ("stance", "shared_fact", "related_event_ids", "clear", "contradicted_event_ids")
 V2_STANCES = ("fact", "guess", "question", "reaction")
 
@@ -460,11 +497,68 @@ def _v2_schema():
     }
 
 
-def _prompt_for(version, reason_mode):
+def _prompt_for(version, reason_mode, with_context=False):
     """(system, schema) - 캐시 키에도 들어가므로 버전이 다르면 캐시가 섞이지 않음"""
     if version == "v1":
         return _system_prompt(reason_mode), _match_schema()
-    return V2_SYSTEM + REASON_SUFFIX[reason_mode], _v2_schema()
+    # 맥락이 있을 때만 규칙을 붙임 → 맥락 없는 메시지는 기존 캐시 그대로 사용
+    return V2_SYSTEM + (CONTEXT_RULES if with_context else "") + REASON_SUFFIX[reason_mode], _v2_schema()
+
+
+# ---------------------------------------------------------------- 대화 맥락
+_LAUGH_ONLY_RE = re.compile(r"^[ㅋㅎㅠㅜㄷ\s!?.~^;]+$")   # 웃음·울음만 → 맥락이 있어도 정보 없음
+_ASK_RE = re.compile(r"[?？]\s*$|(누가|누구|뭐|무슨|언제|어디|어떻게|몇|왜|맞아|맞음|진짜)")
+
+
+def _nospace_len(t):
+    return len(re.sub(r"\s", "", t))
+
+
+def _context_info(req):
+    """
+    반환 dict
+      joined   : 같은 작성자가 방금 나눠 보낸 앞 조각 + 지금 메시지 ("서윤하가 영상을 남겼었어"), 없으면 None
+      question : 다른 사람이 최근에 한 질문 (지금 메시지가 그 답일 수 있음), 없으면 None
+      payload  : Gemini 에 보낼 맥락 [{"who", "text"}]
+    """
+    lines = [c for c in req.context if c.text and c.text.strip()]
+    info = {"joined": None, "question": None, "payload": []}
+    if not lines:
+        return info
+    info["payload"] = [{"who": "writer" if c.same_author else "other", "text": c.text.strip()}
+                       for c in lines]
+
+    # 나눠 보낸 문장: 끝에서부터 같은 작성자의 짧은 메시지가 FRAGMENT_GAP_S 간격 이내로 이어지는 동안
+    frags, later = [], 0
+    for c in reversed(lines):
+        t = c.text.strip()
+        if (not c.same_author or c.seconds_before - later > FRAGMENT_GAP_S
+                or _nospace_len(t) > FRAGMENT_MAX_CHARS or _LAUGH_ONLY_RE.match(t)):
+            break
+        frags.append(t)
+        later = c.seconds_before
+        if len(frags) >= 5:
+            break
+    if frags and _nospace_len(req.message) <= FRAGMENT_MAX_CHARS:
+        info["joined"] = " ".join(list(reversed(frags)) + [req.message.strip()])
+
+    # 질문 → 답: 다른 사람의 가장 최근 메시지가 질문인지 (그 사이 작성자 본인 메시지는 건너뜀)
+    for c in reversed(lines):
+        if c.seconds_before > QUESTION_GAP_S:
+            break
+        if c.same_author:
+            continue
+        if _ASK_RE.search(c.text.strip()):
+            info["question"] = c.text.strip()
+        break
+    return info
+
+
+def _context_may_matter(message, ctx):
+    """1차 필터가 건너뛰려던 짧은 메시지라도 맥락상 답·조각이면 Gemini 로 확인 (웃음만은 제외)"""
+    if not (ctx["joined"] or ctx["question"]):
+        return False
+    return not _LAUGH_ONLY_RE.match(message.strip())
 
 
 # 띄어쓰기를 지운 문장 끝의 확실한 추측·질문 표현 / 사실 보고 표현
@@ -622,7 +716,7 @@ def _split_long_message(text):
     return parts[:8]
 
 
-def _retrieve_candidates(args, req):
+def _retrieve_candidates(args, req, ctx=None):
     """
     기본: 메시지 전체로 top_k 검색 (기존과 동일).
     장문: 문장마다 CHUNK_TOP_K 개를 추가 검색해 합침 → 여러 사건이 섞인 글에서 정답 사건이 빠지지 않게.
@@ -631,6 +725,13 @@ def _retrieve_candidates(args, req):
     base = S["base"]
     candidates = list(base.candidates_for(args, collection=S["col"], model=S["model"]))
     chunks = _split_long_message(req.message) if req.retrieval == "vector" else []
+    if req.retrieval == "vector" and ctx:
+        # 대화 맥락: "남겼었어", "민재현ㅋ" 만으로는 관련 사건이 검색되지 않으므로
+        #  이어 붙인 문장 / 직전 대화 3개 + 지금 메시지로도 검색
+        if ctx.get("joined"):
+            chunks.append(ctx["joined"])
+        if ctx.get("payload"):
+            chunks.append(" ".join([c["text"] for c in ctx["payload"][-3:]] + [req.message]))
     if not chunks:
         return candidates, 0
 
@@ -647,11 +748,13 @@ def _retrieve_candidates(args, req):
     return merged[:MAX_CANDIDATES], len(chunks)
 
 
-def _call_gemini(prompt_candidates, message, system, schema=None):
+def _call_gemini(prompt_candidates, message, system, schema=None, extra=None):
     base = S["base"]
+    # extra: {"context": [...], "joined_message": "..."} - 맥락이 있을 때만 들어감
+    body = {"message": message, **(extra or {}), "candidates": prompt_candidates}
     return S["client"].models.generate_content(
         model=S["gemini_model"],
-        contents=json.dumps({"message": message, "candidates": prompt_candidates}, ensure_ascii=False),
+        contents=json.dumps(body, ensure_ascii=False),
         config={
             "system_instruction": system,
             "temperature": 0,
@@ -702,6 +805,7 @@ def judge(req: JudgeRequest):
     tm = {}
     t_all = time.perf_counter()
     episodes = sorted(set(req.episodes))
+    ctx = _context_info(req)
     args = SimpleNamespace(
         message=req.message, drama_id=req.drama_id, kb_version=req.kb_version,
         episodes=episodes, retrieval=req.retrieval, top_k=req.top_k,
@@ -722,6 +826,9 @@ def judge(req: JudgeRequest):
                 best_sim, best_id = _best_similarity(req, episodes)
             if best_sim is not None and best_sim >= PREFILTER_RESCUE_SIM:
                 pf = {**pf, "decision": "CHECK", "stage": "rescue", "skipped_stage": pf.get("stage")}
+        # "ㅇㅇ", "민재현ㅋ", "남겼었어" 처럼 혼자는 일반 대화지만 직전 질문의 답·나눠 보낸 문장의 끝이면 확인
+        if pf.get("decision") == "SKIP" and _context_may_matter(req.message, ctx):
+            pf = {**pf, "decision": "CHECK", "stage": "context", "skipped_stage": pf.get("stage")}
         pf.update(mode=mode, best_sim=best_sim, best_event_id=best_id)
         tm["prefilter"] = time.perf_counter() - t
 
@@ -752,7 +859,7 @@ def judge(req: JudgeRequest):
     # 1) 후보 사건 검색 (원본 candidates_for 그대로 사용)
     t = time.perf_counter()
     try:
-        candidates, chunk_count = _retrieve_candidates(args, req)
+        candidates, chunk_count = _retrieve_candidates(args, req, ctx)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     tm["retrieval"] = time.perf_counter() - t
@@ -794,7 +901,15 @@ def judge(req: JudgeRequest):
     version = req.prompt_version or PROMPT_VERSION
     if version not in ("v1", "v2"):
         version = "v2"
-    system, schema = _prompt_for(version, req.reason_mode)
+    has_ctx = bool(ctx["payload"])
+    system, schema = _prompt_for(version, req.reason_mode, with_context=has_ctx)
+    gemini_extra = None
+    if has_ctx:
+        gemini_extra = {"context": ctx["payload"]}
+        if ctx["joined"]:
+            gemini_extra["joined_message"] = ctx["joined"]
+    # 말투 보정(_stance_override)은 이어 붙인 문장 기준 ("남겼었어" 혼자가 아니라 "서윤하가 영상을 남겼었어")
+    judge_text = ctx["joined"] or req.message
     key_content = {
         "message": base.compact(req.message),
         "drama_id": req.drama_id,
@@ -807,6 +922,9 @@ def judge(req: JudgeRequest):
         "schema": schema,
         "candidates": prompt_candidates,
     }
+    if gemini_extra:
+        # 같은 "ㅇㅇ" 라도 앞 대화가 다르면 다른 판정 → 캐시 키에 맥락 포함 (맥락 없으면 기존 캐시 그대로)
+        key_content["context"] = gemini_extra
     key_text = json.dumps(key_content, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
     digest = sha256(key_text.encode("utf-8")).hexdigest()
     cache_file = ROOT / "data" / "events" / "demo_match_cache" / f"{digest}.json"
@@ -823,7 +941,7 @@ def judge(req: JudgeRequest):
         if mapped is not None:
             try:
                 answer, reveals_plot, extra_ids, guess_ids, v2meta = _parse_answer(
-                    mapped, version, req.message, id_map)
+                    mapped, version, judge_text, id_map)
                 cache_status = "HIT_MEMORY"
             except Exception:
                 answer, reveals_plot, mapped = None, None, None
@@ -831,7 +949,7 @@ def judge(req: JudgeRequest):
             try:
                 mapped = _unalias(json.loads(cache_file.read_text(encoding="utf-8")).get("answer"), alias_map)
                 answer, reveals_plot, extra_ids, guess_ids, v2meta = _parse_answer(
-                    mapped, version, req.message, id_map)
+                    mapped, version, judge_text, id_map)
                 base.validate_match_answer(answer, id_map)
                 cache_status = "HIT_FILE"
             except Exception:
@@ -841,14 +959,14 @@ def judge(req: JudgeRequest):
     if answer is None:
         t = time.perf_counter()
         try:
-            fut = _gemini_pool.submit(_call_gemini, prompt_candidates, req.message, system, schema)
+            fut = _gemini_pool.submit(_call_gemini, prompt_candidates, req.message, system, schema, gemini_extra)
             response = fut.result(timeout=GEMINI_TIMEOUT_S)
             if not response.text:
                 raise ValueError("Gemini returned an empty response")
             raw_answer = json.loads(response.text)
             mapped = _unalias(raw_answer, alias_map)
             answer, reveals_plot, extra_ids, guess_ids, v2meta = _parse_answer(
-                mapped, version, req.message, id_map)
+                mapped, version, judge_text, id_map)
             base.validate_match_answer(answer, id_map)
             u = getattr(response, "usage_metadata", None)
             if u is not None:
@@ -927,6 +1045,9 @@ def judge(req: JudgeRequest):
         "match_cache": cache_status,
         "prefilter": pf,       # shadow 모드: 'SKIP이었을 텐데 실제 판정은?'을 비교하는 기록
         "prompt_version": version,
+        # 대화 맥락 사용 기록 (관리자 확인용)
+        "context_used": {"lines": len(ctx["payload"]), "joined": ctx["joined"],
+                         "question": ctx["question"]} if has_ctx else None,
     }
     if v2meta is not None:
         # 말하는 방식(fact/guess/question/reaction). stance_model 과 다르면 코드 규칙이 바로잡은 것
