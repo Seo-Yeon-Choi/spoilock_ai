@@ -43,6 +43,9 @@ MAX_CANDIDATES = int(os.getenv("MAX_CANDIDATES", "30"))   # Gemini 에 보낼 �
 FRAGMENT_GAP_S = int(os.getenv("FRAGMENT_GAP_S", "30"))
 FRAGMENT_MAX_CHARS = int(os.getenv("FRAGMENT_MAX_CHARS", "15"))   # 조각 1개 최대 길이(공백 제외)
 QUESTION_GAP_S = int(os.getenv("QUESTION_GAP_S", "120"))          # 이 시간 안의 질문에 대한 답으로 봄
+# 사실을 말했고 관련 사건도 골랐지만 하나로 못 정한 경우(clear=false): on 이면 고른 사건 중 가장 늦은 회차로 가림
+#  off 면 이전처럼 UNCERTAIN(보류 → 지금은 전체 공개)
+UNCLEAR_FACT_AS_MATCH = os.getenv("UNCLEAR_FACT_AS_MATCH", "on").strip().lower() != "off"
 PREFILTER_MODE = os.getenv("PREFILTER_MODE", "shadow")
 # 유사도 통과 임계값. calibrate_prefilter.py 결과로 정한 뒤 설정. 비우면 유사도 통과 미사용
 _sim = os.getenv("PREFILTER_SIM_THRESHOLD", "").strip()
@@ -363,7 +366,8 @@ Fill the fields in this order.
      * a fact wrapped in emotion or a joke ("~해서 소름", "~라니 개웃김", "~장면 슬펐다")
      * claims that may be wrong or joking ("사실 걔가 범인임") - you cannot tell a joke from a twist
      Korean endings that report what was seen or heard are facts: ~했어, ~었어, ~더라, ~더라고,
-     ~했대, ~래, ~네, ~구나, ~라니, ~는 장면, ~함, ~됨, ~임, and "~나 봐", "~것 같더라" about what happened.
+     ~했대, ~래, ~네, ~구나, ~라니, ~는 장면, ~함, ~됨, ~임, ~했잖아, ~한대잖아, ~라잖아,
+     and "~나 봐", "~것 같더라" about what happened.
    - "guess": speculation about something the writer does not know yet: ~아닐까, ~일까, ~려나,
      ~하지 않을까, ~거 아니야?, ~인가?, 혹시 ~?, ~할 것 같아 (prediction), ~듯 (prediction).
    - "question": asks for information without asserting a story fact ("서윤하가 누구야?",
@@ -460,19 +464,30 @@ first ("who": "writer" = the same person who wrote the message, "other" = someon
 - Judge ONLY "message". Context is there so you understand what the message refers to. Never report
   a fact that only a context line states; related_event_ids must come from what the message itself
   says or confirms.
-- Split sentence: when "joined_message" is given, the writer sent one sentence in several short
-  pieces ("서윤하가" / "영상을" / "남겼었어"). If the message is a piece that completes that sentence
-  (a verb, an object, an ending - meaningless alone), judge "joined_message" as the writer's
-  statement. If the message is a complete reaction on its own ("대박", "소름", "ㅋㅋ"), judge it alone.
-- Answer to a question: when the message answers or confirms an earlier question from another person,
-  read the two together as one statement and judge that statement: stance "fact", shared_fact = the
-  combined statement.
+- "reply_to": when given, it is the ONE question the message may be answering. A short answer
+  ("ㅇㅇ", "ㄴㄴ", "맞음", a name, an episode number) answers reply_to and nothing else - never an
+  older line in the context. If reply_to asks about something that is not in the candidates (an
+  unknown person, a topic no candidate covers, a joke), the answer reveals nothing:
+  stance "reaction", related_event_ids [].
+    reply_to "장준호 공부함 ?" -> "ㄴㄴ"  = about 장준호 studying; no candidate is about that -> reaction, []
+- Answer to a question: when the message answers or confirms reply_to, read the two together as one
+  statement and judge that statement: stance "fact", shared_fact = the combined statement.
     "누가 설치함?" -> "민재현ㅋ"            = "민재현이 설치함"
     "몇 화에 카메라 설치됨?" -> "2화 ㅋ"    = "2화에 카메라 설치됨"
     "강도현 2화에서 죽어?" -> "ㅇㅇ 죽음"   = "강도현이 2화에서 죽음"
     "문을 열어준다고?" -> "ㅇㅇ"            = "문을 열어줌"
     "누가 실험하는 거임?" -> "서윤하"       = "서윤하가 실험함"
+  Confirming a guess is a fact, not agreement or a reaction:
+    "강도현은 뭐 알고있는거 아님?" -> "ㅇㅇ"  = "강도현은 뭔가 알고 있음"
+    "서윤하가 기억 잃은 척 하는 거 아님?" -> "맞음" = "서윤하가 기억 잃은 척함"
   A denial is a fact too ("서윤하 죽어?" -> "ㄴㄴ" = "서윤하는 안 죽음").
+  Pick related_event_ids for the combined statement: the candidate must match what reply_to asks
+  about (same person, same action). A candidate about a different topic from older context lines
+  is never related.
+- Split sentence: when "joined_message" is given, the writer sent one sentence in several short
+  pieces ("서윤하가" / "영상을" / "남겼었어"). If the message is a piece that completes that sentence
+  (a verb, an object, an ending - meaningless alone), judge "joined_message" as the writer's
+  statement. If the message is a complete reaction on its own ("대박", "소름", "ㅋㅋ"), judge it alone.
 - Not an answer: laughter, emotion, refusing to answer, or a new question ("ㅋㅋ", "헐", "궁금함?",
   "왜?", "몰라") adds no information -> judge the message alone (usually reaction or question)."""
 
@@ -507,7 +522,9 @@ def _prompt_for(version, reason_mode, with_context=False):
 
 # ---------------------------------------------------------------- 대화 맥락
 _LAUGH_ONLY_RE = re.compile(r"^[ㅋㅎㅠㅜㄷ\s!?.~^;]+$")   # 웃음·울음만 → 맥락이 있어도 정보 없음
-_ASK_RE = re.compile(r"[?？]\s*$|(누가|누구|뭐|무슨|언제|어디|어떻게|몇|왜|맞아|맞음|진짜)")
+_ASK_RE = re.compile(r"[?？]|(누가|누구|뭐|뭔|뭘|무슨|언제|어디|어떻게|몇)")
+# 다른 사람의 짧은 맞장구("ㅇㅇ", "맞음ㅋ", "ㄴㄴ") → 질문을 찾을 때 건너뜀 (같은 질문에 여러 명이 답하는 경우)
+_SHORT_REPLY_MAX = 4
 
 
 def _nospace_len(t):
@@ -525,8 +542,6 @@ def _context_info(req):
     info = {"joined": None, "question": None, "payload": []}
     if not lines:
         return info
-    info["payload"] = [{"who": "writer" if c.same_author else "other", "text": c.text.strip()}
-                       for c in lines]
 
     # 나눠 보낸 문장: 끝에서부터 같은 작성자의 짧은 메시지가 FRAGMENT_GAP_S 간격 이내로 이어지는 동안
     frags, later = [], 0
@@ -542,15 +557,37 @@ def _context_info(req):
     if frags and _nospace_len(req.message) <= FRAGMENT_MAX_CHARS:
         info["joined"] = " ".join(list(reversed(frags)) + [req.message.strip()])
 
-    # 질문 → 답: 다른 사람의 가장 최근 메시지가 질문인지 (그 사이 작성자 본인 메시지는 건너뜀)
-    for c in reversed(lines):
-        if c.seconds_before > QUESTION_GAP_S:
-            break
-        if c.same_author:
-            continue
-        if _ASK_RE.search(c.text.strip()):
-            info["question"] = c.text.strip()
-        break
+    # 질문 → 답: 다른 사람의 최근 질문 1개 (작성자 본인 메시지, 다른 사람의 짧은 맞장구는 건너뜀)
+    qi = None
+    # 지금 메시지가 질문이면 답이 아님 ("강도현이 전남친임 ?" 은 앞 질문의 답으로 보지 않음)
+    is_question = "?" in req.message or "？" in req.message
+    if not is_question:
+        for i in range(len(lines) - 1, -1, -1):
+            c = lines[i]
+            t = c.text.strip()
+            if c.seconds_before > QUESTION_GAP_S:
+                break
+            if c.same_author:
+                continue
+            if _ASK_RE.search(t):
+                qi = i
+                break
+            if _nospace_len(t) <= _SHORT_REPLY_MAX or _LAUGH_ONLY_RE.match(t):
+                continue      # "ㅇㅇ", "맞음ㅋ" → 같은 질문에 먼저 답한 사람
+            break             # 질문이 아닌 일반 문장 → 그 앞 질문은 이미 지나간 대화
+    if qi is not None:
+        info["question"] = lines[qi].text.strip()
+
+    # Gemini 에 보낼 맥락: 오래된 다른 주제가 섞이지 않게 필요한 줄만
+    #  질문이 있으면 그 질문부터 / 나눠 보낸 문장이면 그 조각들 / 그 외 직전 3줄
+    if qi is not None:
+        picked = lines[qi:]
+    elif info["joined"]:
+        picked = lines[len(lines) - len(frags):]
+    else:
+        picked = lines[-3:]
+    info["payload"] = [{"who": "writer" if c.same_author else "other", "text": c.text.strip()}
+                       for c in picked]
     return info
 
 
@@ -670,6 +707,11 @@ def _parse_answer(raw, version, message, id_map):
         if related and clear:
             answer = {"verdict": "MATCH", "event_id": related[0], "reason": reason}
             matched, guesses = related, []
+        elif related and shared.strip() and UNCLEAR_FACT_AS_MATCH:
+            # 사실을 말했고 후보도 골랐지만 하나로 못 정함 (비슷한 사건이 여러 개) → 고른 사건 중 가장 늦은 회차로 가림
+            #  공통 사실(shared_fact)이 없으면 이름만 같은 경우라 여기 오지 않음
+            answer = {"verdict": "MATCH", "event_id": related[0], "reason": reason}
+            matched, guesses = related, []
         else:
             answer = {"verdict": "UNCERTAIN", "event_id": "", "reason": reason}
             matched, guesses = [], []
@@ -730,8 +772,10 @@ def _retrieve_candidates(args, req, ctx=None):
         #  이어 붙인 문장 / 직전 대화 3개 + 지금 메시지로도 검색
         if ctx.get("joined"):
             chunks.append(ctx["joined"])
-        if ctx.get("payload"):
-            chunks.append(" ".join([c["text"] for c in ctx["payload"][-3:]] + [req.message]))
+        if ctx.get("question"):
+            chunks.append(ctx["question"] + " " + req.message)      # 답은 이 질문하고만 묶어서 검색
+        elif ctx.get("payload") and not ctx.get("joined"):
+            chunks.append(" ".join([c["text"] for c in ctx["payload"]] + [req.message]))
     if not chunks:
         return candidates, 0
 
@@ -908,6 +952,8 @@ def judge(req: JudgeRequest):
         gemini_extra = {"context": ctx["payload"]}
         if ctx["joined"]:
             gemini_extra["joined_message"] = ctx["joined"]
+        if ctx["question"]:
+            gemini_extra["reply_to"] = ctx["question"]
     # 말투 보정(_stance_override)은 이어 붙인 문장 기준 ("남겼었어" 혼자가 아니라 "서윤하가 영상을 남겼었어")
     judge_text = ctx["joined"] or req.message
     key_content = {
