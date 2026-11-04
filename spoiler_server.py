@@ -355,7 +355,16 @@ Fill the fields in this order.
    - "question": asks for information without asserting a story fact ("서윤하가 누구야?",
      "몇 화까지 봤어?", "이거 무슨 장면이야?").
    - "reaction": emotion, opinion, praise, criticism, greetings, small talk, or anything with no story
+          Feelings or opinions ABOUT A CHARACTER are reactions too, even with the character's name:
+     "강도현 수상해", "민재현 무섭다", "서윤하 불쌍해", "윤하 너무 예쁨", "도현이 최애", "재현이 싫어",
+     "윤하 나올 때마다 긴장됨". They say how the viewer feels, not what happened.
+     It becomes a fact only when it also says what happened ("윤하 죽어서 불쌍해", "도현이 거짓말해서 싫어").
      content ("소름", "대박", "이번 화 미쳤다", "연기 좋다", "몰라", "ㅋㅋㅋ").
+    Basic information is NOT a plot fact: who the main character is, character names and their
+   spelling, roles or jobs as introduced at the start, actors, genre, and where/when the show is
+   set ("주인공은 서윤하임", "주인공 성이 서씨임", "남주는 형사임", "배우 연기 좋다") -> stance "reaction".
+   Exception: a hidden identity or a twist about who someone really is ("사실 형사가 아니었음",
+   "진짜 이름이 따로 있었음") is a fact.
    Presupposition: when a question or guess takes a story fact as already known
    ("강도현이 범인인 거 알았어?", "윤하는 왜 문을 열어줬을까?", "재현이 찾아온 다음에 어떻게 됐더라?"),
    that known part is stated -> stance = "fact".
@@ -375,8 +384,10 @@ Fill the fields in this order.
      treated like a guess. An open question (누가 / 뭐 / 무슨 / 언제 / 어디 / 어떻게 / 몇 / 왜, e.g. "다음 화에서
      누가 죽을까?", "둘이 무슨 관계야?") proposes nothing -> [].
    - reaction: [].
-   Same names or the same topic alone are NOT enough: the actor, action, target or outcome must line
-   up. When several candidates share a topic, choose the one whose specific details match (who, what,
+    Same names or the same topic alone are NOT enough: the actor, action, target or outcome must line
+   up. A character name is the most common false link: if the ONLY thing the message shares with a
+   candidate is a character name (or a place / object name), related_event_ids = [] and the message is
+   not about that candidate. When several candidates share a topic, choose the one whose specific details match (who, what,
    where); do not fall back to a more general or earlier candidate.
 
 4. clear - true when related_event_ids clearly identify what the message states. false when the
@@ -400,24 +411,29 @@ Character references (viewers rarely use full names):
 - Nicknames, descriptions and typos ("빡빡이", "안경남", "강도형") are references too when the rest of
   the sentence (the action and situation) fits exactly one character in the candidates.
 
-Examples - a FICTIONAL drama, only to show the format. Candidates:
-  E1 민지가 새벽 옥상에서 준호를 만나 오빠 사고의 비밀을 털어놓는다
-  E2 준호가 민지 오빠를 차로 친 뺑소니 범인으로 밝혀진다
-  E3 민지 오빠는 사고 후 의식을 되찾지 못한다
-  E4 준호가 사고 당일 블랙박스 영상을 몰래 지운다
+Examples - an IMAGINARY drama made up only to show the format (하람, 도건 do not exist anywhere;
+never treat them, or names that look like them, as evidence of another work). Candidates:
+  E1 하람이 새벽 옥상에서 도건을 만나 오빠 사고의 비밀을 털어놓는다
+  E2 도건이 하람 오빠를 차로 친 뺑소니 범인으로 밝혀진다
+  E3 하람 오빠는 사고 후 의식을 되찾지 못한다
+  E4 도건이 사고 당일 블랙박스 영상을 몰래 지운다
 - "옥상에서 둘이 만나는 장면 소름이었어" -> fact, [E1], clear true
 - "여주가 남주한테 다 말해버림" -> fact, [E1], clear true
-- "준호가 범인이었다니 ㄷㄷ" -> fact, [E2], clear true
+- "도건이 범인이었다니 ㄷㄷ" -> fact, [E2], clear true
 - "블박 지우는 거 봤어? 미쳤음" -> fact (presupposed), [E4], clear true
-- "오빠 아직 못 깨어남 그리고 준호가 범인" -> fact, [E3, E2], clear true
-- "준호가 범인인 거 아니야?" -> guess, [E2]
+- "오빠 아직 못 깨어남 그리고 도건이 범인" -> fact, [E3, E2], clear true
+- "도건이 범인인 거 아니야?" -> guess, [E2]
 - "오빠 끝까지 못 깨어나는 거 아닐까" -> guess, [E3]
-- "민지가 범인일까?" -> guess, [] (contradicts nothing it would reveal)
-- "사실 민지가 범인임 ㅋㅋ" -> fact, [], clear false, contradicted [E2]
+- "하람이 범인일까?" -> guess, [] (contradicts nothing it would reveal)
+- "사실 하람이 범인임 ㅋㅋ" -> fact, [], clear false, contradicted [E2]
 - "누가 누굴 다치게 한 것 같던데" -> fact, [], clear false
-- "준호 누구야?" -> question, []
+- "도건 누구야?" -> question, []
 - "다음 화에서 누가 다칠까?" -> question, [] (open question, proposes no answer)
 - "이번 화 미쳤다" -> reaction, []
+- "주인공은 하람임" -> reaction, [] (basic information, not a plot fact)
+- "도건 진짜 수상해" -> reaction, [] (an opinion about a character; E2 shares only the name)
+- "하람 너무 불쌍하다" -> reaction, [] (a feeling; nothing that happened is stated)
+- "하람 오빠 다쳐서 불쌍하다" -> fact, [E3], clear true (the feeling comes with what happened)
 - "오징어게임에서 결국 주인공이 우승함" -> work other, fact, [] (another title, nothing in common)
 - "다른 드라마 얘긴데 거기선 형사가 범인이었음" -> work other, fact, []
 - "철수가 결국 범인이었음" (a name not in the candidates, no other title) -> work this or unknown,
@@ -456,6 +472,7 @@ _GUESS_END_RE = re.compile(
     r"(아닐까|일까|려나|지않을까|거아니야|거아냐|건가|인가|을까요|을까)[?？!~.ㅋㅎㄷ]*$")
 _TRAIL_RE = re.compile(r"[?？!~.ㅋㅎㄷㅠ]+$")
 _QUESTION_WORD_RE = re.compile(r"(누구|뭐|무엇|언제|어디|어떻게|몇)")
+_WHY_RE = re.compile(r"왜")
 _OPEN_QUESTION_RE = re.compile(r"(누가|누구|뭐|무엇|무슨|언제|어디|어떻게|몇|왜)")
 
 
@@ -546,6 +563,16 @@ def _parse_answer(raw, version, message, id_map):
         return answer, False, [], [], meta
 
     if stance == "fact":
+        # "왜 ~했을까?"처럼 이유를 묻는 질문이 특정 사건을 가리키면, '~했다'는 사실을 전제로 깐 것 → 사실로 봄
+        #  ("민재현은 왜 서윤하랑 결혼하려 한 걸까?" = 결혼하려 했다는 사실 노출)
+        if stance in ("question", "guess") and related and clear and _WHY_RE.search(message):
+            overridden = overridden or stance
+            stance = "fact"
+
+        # 공통 사실을 한 구절도 못 적었으면 이름만 같아서 연결한 것으로 보고 확정하지 않음
+        shared = raw.get("shared_fact") if isinstance(raw.get("shared_fact"), str) else ""
+        if stance == "fact" and related and not shared.strip():
+            clear = False
         if related and clear:
             answer = {"verdict": "MATCH", "event_id": related[0], "reason": reason}
             matched, guesses = related, []
