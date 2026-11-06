@@ -2,7 +2,6 @@
 
 This is a draft-event demo API, not a verified production spoiler classifier.
 """
-import copy
 import json
 import os
 import re
@@ -51,8 +50,6 @@ PREFILTER_MODE = os.getenv("PREFILTER_MODE", "shadow")
 _sim = os.getenv("PREFILTER_SIM_THRESHOLD", "").strip()
 PREFILTER_SIM_THRESHOLD = float(_sim) if _sim else None
 MEMORY_CACHE_SIZE = 5000
-# 판정 프롬프트 버전: v2(말하는 방식 stance + 관련 사건, 판정은 코드가 결정) / v1(이전 프롬프트)
-PROMPT_VERSION = os.getenv("PROMPT_VERSION", "v2").strip().lower() or "v2"
 TIMING_LOG = ROOT / "data" / "tests" / "server_timing.jsonl"
 
 S: dict = {}                       # 서버 시작 시 준비되는 자원
@@ -161,8 +158,6 @@ class JudgeRequest(BaseModel):
     reason_mode: str = Field(
         "full", pattern="^(full|short|none)$",
         description="Gemini 판단 이유 길이. full=기존, short=15자 이내, none=생성 안 함(출력 토큰↓ → 속도↑)")
-    prompt_version: str | None = Field(
-        None, pattern="^(v1|v2)$", description="이 요청만 프롬프트 버전 변경(비교 테스트용). 비우면 PROMPT_VERSION")
     context: list[ContextLine] = Field(
         default_factory=list, max_length=10,
         description="직전 대화 (Spring 채팅만 보냄). 질문→답, 나눠 보낸 문장 해석용")
@@ -180,125 +175,6 @@ REASON_SUFFIX = {
     "short": "\nKeep the reason extremely short: at most 15 Korean characters.",
     "none": '\nDo not explain. Always return reason as an empty string "".',
 }
-
-
-# 판정 보강 (사건 DB가 해당 회차의 줄거리를 모두 담고 있다는 전제)
-#  - 바꿔 말한 문장도 핵심 사실이 같으면 MATCH → UNCERTAIN 감소
-#  - reveals_plot: 줄거리 정보를 '사실로' 드러내는가 (감상·질문·추측은 false)
-PLOT_RULES_SUFFIX = """
-
-Additional rules:
-- Treat the event candidates as the complete list of plot facts for these episodes.
-- Paraphrases, summaries, translations, and partial descriptions that convey the same core fact
-  of a candidate (who did what, what happened, an identity, a relationship, a death, an outcome)
-  count as MATCH. For each fact, pick the closest candidate.
-- A message may reveal several different facts, possibly from different episodes. Then return
-  MATCH, put the most important one in event_id, and list EVERY matching candidate in
-  matched_event_ids (including event_id). Revealing several facts is NOT a reason for UNCERTAIN.
-- matched_event_ids must be [] unless verdict is MATCH.
-- Use UNCERTAIN when two or more candidates fit one fact equally well, or when the message
-  states a plot fact but is too vague to tell which candidate it refers to.
-- Between NO_MATCH and UNCERTAIN: if the message is a statement about the story (not a question
-  or a pure reaction) and it plausibly refers to any candidate, return at least UNCERTAIN and set
-  reveals_plot=true. Use NO_MATCH only when it clearly matches none of the candidates or carries
-  no story information.
-
-Character references (viewers rarely use full names):
-- Role words refer to the main characters in the candidates: "남주", "여주", "두 남주", "남주 둘",
-  "남주1/남주2", "서브남", "주인공", "그 남자", "걔". The main characters are the ones who appear most
-  often in the candidates (e.g. the woman at the center of the events is "여주", the men around her
-  are "남주").
-- Given names without the family name refer to the same person ("윤하" = "서윤하", "도현" = "강도현").
-- A name that matches no character (a typo or a different name) is not a confident reference by
-  itself; judge the rest of the message.
-
-Summaries, outcomes and scene mentions are plot facts:
-- A message that states a development in general terms still reveals it and is a MATCH when a
-  candidate describes that development, even without details: who confronts or argues with whom,
-  who pressures, manipulates or deceives whom, who suspects whom, who is behind something.
-  e.g. "남주 둘이 서로 말다툼함" reveals that the two men accuse each other.
-  e.g. "남주 둘이서 여주한테 선택을 강요함" reveals that they push her choice.
-- Statements about outcomes, including negative ones, reveal the outcome: "아직 아무도 안 죽었어",
-  "결국 안 죽음", "살아남았어", "범인 아니었어". Match the candidate about that survival/outcome.
-- Saying that a specific scene, recording or object appears reveals that scene: "연구실에서 녹화한
-  영상 나옴", "책장에서 카메라 나옴", "미래 영상이 바뀜". Match the candidate that contains it.
-
-Retelling scenes and dialogue is a plot fact:
-- Viewers often retell an episode scene by scene: who came, who said what, what someone asked or
-  ordered ("도현이가 빨리 문 닫아야 한다고 했어", "그리고 재현이 찾아왔어", "재현이가 너 도현이랑 같이
-  있지? 했어", "윤하가 혼자 왔냐고 물어봤지"). This reveals the episode content even when it is not
-  a major twist. It is NOT small talk; reveals_plot=true.
-- If the retold moment belongs to the same scene as a candidate (same characters, same place or
-  situation, a line from its evidence, or what happens right before/after it), return MATCH with
-  that candidate so the episode is known.
-- If it clearly describes concrete story events but you cannot tell which candidate's scene it is,
-  return UNCERTAIN (never NO_MATCH).
-- When several candidates share a topic (a transfer, a satellite, an aircraft, a government lie),
-  pick the one whose specific details match the message (who, what, where). Do not fall back to an
-  earlier or more general candidate just because the topic is the same.
-- event_id must be one of the candidate ids exactly as given (E1, E2, ...).
-- Korean endings that report something seen or heard state a fact, not a guess:
-  "~하더라", "~했대", "~래", "~네", "~구나", "~었어", "~더라고", "~라니", "~는 장면".
-  "~나 봐" / "~인가 봐" / "~것 같더라" describing what happened in the episode also state a fact.
-  Only messages about the future or the unknown ("~일까?", "~할 것 같아", "~하지 않을까")
-  are guesses.
-- Judge by the information a reader learns, not by the tone. A reaction, joke or emotion that
-  describes what happened still reveals the fact and is a MATCH, even if the emotion comes first
-  or last ("~라니 무섭다", "~하는 거 개웃김", "~장면 흥미로웠음", "~해서 소름").
-  e.g. "CCTV에 그림자 보이는 거 소름이었어" reveals that a shadow appears on the CCTV,
-  so it matches a candidate about a shadowy figure caught on CCTV.
-  e.g. "걔 죽는 장면 진짜 슬펐다" reveals the death → MATCH.
-- Pure reactions with no story information ("소름", "대박", "이번 화 미쳤다", "연기 좋다"),
-  questions and guesses/predictions ("~일까?", "~인 것 같아", "I think", "maybe") are NOT a MATCH,
-  even if they name a character or the show; return NO_MATCH for them.
-
-Also set guessed_event_ids (array):
-- When the message is a guess, question or prediction ("~일 것 같아", "~아닐까?", "~일까?",
-  "~하지 않을까", "혹시 ~?") and its content, if it were true, would reveal the same core fact as a
-  candidate, list those candidate ids (E1, E2, ...). The guess may be phrased as uncertain; what
-  matters is that it points at the same fact.
-- Use [] when the message is not a guess, when the guess contradicts or does not match any
-  candidate (a wrong guess), or when it only names a character or topic.
-- Never put an id in both matched_event_ids and guessed_event_ids.
-
-Also set reveals_plot (boolean) for the chat message itself:
-- true if the message lets a reader learn story information: what happened, what was seen in a
-  scene, who did what, identities, relationships, deaths, outcomes, or the ending - even when it
-  is wrapped in a reaction or emotion ("~해서 소름", "~하는 장면 슬펐어").
-- Also true for general summaries of the story or of a relationship ("남주 둘이 싸움", "아직 아무도
-  안 죽음") because they tell what happened.
-- false only for reactions without story content, opinions, praise/criticism, questions, guesses,
-  predictions, greetings, and unrelated small talk."""
-
-
-def _system_prompt(reason_mode):
-    return S["base"].MATCH_SYSTEM + REASON_SUFFIX[reason_mode] + PLOT_RULES_SUFFIX
-
-
-def _match_schema():
-    """기존 MATCH_SCHEMA 에 reveals_plot(boolean), matched_event_ids(string[]) 를 필수로 추가한 복사본"""
-    schema = copy.deepcopy(S["base"].MATCH_SCHEMA)
-    props = schema.setdefault("properties", {})
-    props["reveals_plot"] = {"type": "boolean"}
-    props["matched_event_ids"] = {"type": "array", "items": {"type": "string"}}
-    props["guessed_event_ids"] = {"type": "array", "items": {"type": "string"}}
-    required = schema.setdefault("required", [])
-    for field in ("reveals_plot", "matched_event_ids", "guessed_event_ids"):
-        if field not in required:
-            required.append(field)
-    return schema
-
-
-def _split_answer(raw):
-    """Gemini 응답에서 추가 필드를 분리. 기존 validate_match_answer 는 원래 필드만 허용하므로"""
-    if not isinstance(raw, dict):
-        return raw, None
-    core = {k: v for k, v in raw.items() if k not in EXTRA_FIELDS}
-    reveals = raw.get("reveals_plot")
-    return core, (reveals if isinstance(reveals, bool) else None)
-
-
-EXTRA_FIELDS = ("reveals_plot", "matched_event_ids", "guessed_event_ids")
 
 
 def _unalias(raw, alias_map):
@@ -491,7 +367,6 @@ first ("who": "writer" = the same person who wrote the message, "other" = someon
 - Not an answer: laughter, emotion, refusing to answer, or a new question ("ㅋㅋ", "헐", "궁금함?",
   "왜?", "몰라") adds no information -> judge the message alone (usually reaction or question)."""
 
-V2_EXTRA_FIELDS = ("stance", "shared_fact", "related_event_ids", "clear", "contradicted_event_ids")
 V2_STANCES = ("fact", "guess", "question", "reaction")
 
 
@@ -512,10 +387,8 @@ def _v2_schema():
     }
 
 
-def _prompt_for(version, reason_mode, with_context=False):
-    """(system, schema) - 캐시 키에도 들어가므로 버전이 다르면 캐시가 섞이지 않음"""
-    if version == "v1":
-        return _system_prompt(reason_mode), _match_schema()
+def _prompt_for(reason_mode, with_context=False):
+    """(system, schema) - 캐시 키에도 들어가므로 프롬프트가 바뀌면 캐시가 섞이지 않음"""
     # 맥락이 있을 때만 규칙을 붙임 → 맥락 없는 메시지는 기존 캐시 그대로 사용
     return V2_SYSTEM + (CONTEXT_RULES if with_context else "") + REASON_SUFFIX[reason_mode], _v2_schema()
 
@@ -668,15 +541,11 @@ def _stance_override(stance, message):
     return stance, None
 
 
-def _parse_answer(raw, version, message, id_map):
+def _parse_answer(raw, message, id_map):
     """
     Gemini 응답(사건 ID 는 실제 ID 로 바꾼 상태) → (answer, reveals_plot, matched_ids, guess_ids, meta)
     answer 는 기존 형식 {verdict, event_id, reason} 이라 validate_match_answer·Spring 응답이 그대로 동작.
     """
-    if version == "v1":
-        answer, reveals = _split_answer(raw)
-        return answer, reveals, _matched_ids(raw), _matched_ids(raw, "guessed_event_ids"), None
-
     if not isinstance(raw, dict) or raw.get("stance") not in V2_STANCES:
         raise ValueError("Invalid Gemini v2 result: stance")
     stance, overridden = _stance_override(raw["stance"], message)
@@ -803,7 +672,7 @@ def _call_gemini(prompt_candidates, message, system, schema=None, extra=None):
             "system_instruction": system,
             "temperature": 0,
             "response_mime_type": "application/json",
-            "response_json_schema": schema or _match_schema(),
+            "response_json_schema": schema or _v2_schema(),
         },
     )
 
@@ -941,12 +810,9 @@ def judge(req: JudgeRequest):
     if req.retrieval == "all":
         prompt_candidates.sort(key=lambda item: item["event_id"])
 
-    # 2) 판별 캐시 키 (프롬프트·스키마가 키에 들어가므로 버전이 바뀌면 자동으로 새로 판정)
-    version = req.prompt_version or PROMPT_VERSION
-    if version not in ("v1", "v2"):
-        version = "v2"
+    # 2) 판별 캐시 키 (프롬프트·스키마가 키에 들어가므로 프롬프트가 바뀌면 자동으로 새로 판정)
     has_ctx = bool(ctx["payload"])
-    system, schema = _prompt_for(version, req.reason_mode, with_context=has_ctx)
+    system, schema = _prompt_for(req.reason_mode, with_context=has_ctx)
     gemini_extra = None
     if has_ctx:
         gemini_extra = {"context": ctx["payload"]}
@@ -987,7 +853,7 @@ def judge(req: JudgeRequest):
         if mapped is not None:
             try:
                 answer, reveals_plot, extra_ids, guess_ids, v2meta = _parse_answer(
-                    mapped, version, judge_text, id_map)
+                    mapped, judge_text, id_map)
                 cache_status = "HIT_MEMORY"
             except Exception:
                 answer, reveals_plot, mapped = None, None, None
@@ -995,7 +861,7 @@ def judge(req: JudgeRequest):
             try:
                 mapped = _unalias(json.loads(cache_file.read_text(encoding="utf-8")).get("answer"), alias_map)
                 answer, reveals_plot, extra_ids, guess_ids, v2meta = _parse_answer(
-                    mapped, version, judge_text, id_map)
+                    mapped, judge_text, id_map)
                 base.validate_match_answer(answer, id_map)
                 cache_status = "HIT_FILE"
             except Exception:
@@ -1012,7 +878,7 @@ def judge(req: JudgeRequest):
             raw_answer = json.loads(response.text)
             mapped = _unalias(raw_answer, alias_map)
             answer, reveals_plot, extra_ids, guess_ids, v2meta = _parse_answer(
-                mapped, version, judge_text, id_map)
+                mapped, judge_text, id_map)
             base.validate_match_answer(answer, id_map)
             u = getattr(response, "usage_metadata", None)
             if u is not None:
@@ -1090,7 +956,7 @@ def judge(req: JudgeRequest):
         "candidate_count": len(candidates),
         "match_cache": cache_status,
         "prefilter": pf,       # shadow 모드: 'SKIP이었을 텐데 실제 판정은?'을 비교하는 기록
-        "prompt_version": version,
+        "prompt_version": "v2",      # 응답 형식 유지용 (v1 프롬프트는 삭제됨)
         # 대화 맥락 사용 기록 (관리자 확인용)
         "context_used": {"lines": len(ctx["payload"]), "joined": ctx["joined"],
                          "question": ctx["question"]} if has_ctx else None,
