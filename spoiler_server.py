@@ -40,8 +40,14 @@ MAX_CANDIDATES = int(os.getenv("MAX_CANDIDATES", "30"))   # Gemini 에 보낼 �
 # 1차 필터 모드: off(사용 안 함) / shadow(판단만 기록, 검사는 전부 수행) / on(통과 채팅은 Gemini 생략)
 # 대화 맥락: 같은 작성자가 이 간격(초) 안에 연달아 보낸 짧은 조각은 한 문장으로 이어 붙임
 FRAGMENT_GAP_S = int(os.getenv("FRAGMENT_GAP_S", "30"))
-FRAGMENT_MAX_CHARS = int(os.getenv("FRAGMENT_MAX_CHARS", "15"))   # 조각 1개 최대 길이(공백 제외)
+FRAGMENT_MAX_CHARS = int(os.getenv("FRAGMENT_MAX_CHARS", "25"))   # 조각 1개 최대 길이(공백 제외)
 QUESTION_GAP_S = int(os.getenv("QUESTION_GAP_S", "120"))          # 이 시간 안의 질문에 대한 답으로 봄
+# 자막 대사 비교: 사건과 연결된 자막 청크의 대사와 비슷한 채팅 → 그 사건을 후보에 넣고 대사를 함께 보냄
+SUBTITLE_QUOTE = os.getenv("SUBTITLE_QUOTE", "on").strip().lower() != "off"
+SUBTITLE_KB_DIR = Path(os.getenv("SUBTITLE_KB_DIR", str(ROOT / "data" / "kb")))
+QUOTE_MIN_CHARS = int(os.getenv("QUOTE_MIN_CHARS", "6"))           # 이보다 짧은 대사("왜?", "말해.")는 비교 안 함
+QUOTE_EXPLICIT_MIN = float(os.getenv("QUOTE_EXPLICIT_MIN", "0.6"))  # "~라고 했잖아"·따옴표 인용: 대사가 이만큼 들어 있으면 인용
+QUOTE_PLAIN_MIN = float(os.getenv("QUOTE_PLAIN_MIN", "0.65"))      # 대사만 친 경우: 이 이상이면 후보로 (판정은 Gemini)
 # 사실을 말했고 관련 사건도 골랐지만 하나로 못 정한 경우(clear=false): on 이면 고른 사건 중 가장 늦은 회차로 가림
 #  off 면 이전처럼 UNCERTAIN(보류 → 지금은 전체 공개)
 UNCLEAR_FACT_AS_MATCH = os.getenv("UNCLEAR_FACT_AS_MATCH", "on").strip().lower() != "off"
@@ -367,6 +373,16 @@ first ("who": "writer" = the same person who wrote the message, "other" = someon
 - Not an answer: laughter, emotion, refusing to answer, or a new question ("ㅋㅋ", "헐", "궁금함?",
   "왜?", "몰라") adds no information -> judge the message alone (usually reaction or question)."""
 
+SUBTITLE_RULES = """
+
+Subtitle lines. The input may have "subtitle_quotes": lines from this drama's subtitles that look like
+what the message says, each with the episode, the speaker and the candidate events of that scene.
+- If the message quotes or repeats such a line - as a statement, as retelling ("서윤하가 '...'라고
+  했잖아"), or even inside a question ("'...'가 무슨 뜻이야?", "도현이가 '...'라고 한 거 맞아?") - it
+  reveals that scene: stance "fact", related_event_ids = that line's event_ids, clear true,
+  shared_fact = who said the line in which scene.
+- If the message only shares a few common words with the line and does not repeat it, ignore the line."""
+
 V2_STANCES = ("fact", "guess", "question", "reaction")
 
 
@@ -387,11 +403,151 @@ def _v2_schema():
     }
 
 
-def _prompt_for(reason_mode, with_context=False):
+def _prompt_for(reason_mode, with_context=False, with_quotes=False):
     """(system, schema) - 캐시 키에도 들어가므로 프롬프트가 바뀌면 캐시가 섞이지 않음"""
     # 맥락이 있을 때만 규칙을 붙임 → 맥락 없는 메시지는 기존 캐시 그대로 사용
-    return V2_SYSTEM + (CONTEXT_RULES if with_context else "") + REASON_SUFFIX[reason_mode], _v2_schema()
+    return (V2_SYSTEM + (CONTEXT_RULES if with_context else "") + (SUBTITLE_RULES if with_quotes else "")
+            + REASON_SUFFIX[reason_mode]), _v2_schema()
 
+# ---------------------------------------------------------------- 자막 대사 비교
+#  자막 청크(chunks.json, 사건 분석 때 저장됨)의 대사와 채팅을 자모 단위로 비교.
+#  사건과 연결된 청크(source_chunk_ids)의 대사만 사용 → 일상 대사("밥 먹었어?")는 무시
+#  비교는 메모리에서 글자 조각 집합 교집합이라 회차 10개(1,500줄) 기준 1ms 미만
+_SUB_CACHE = {}          # (drama_id, kb_version) → (만든 시각, 대사 목록)
+_SUB_TTL_S = 60          # 새 회차 분석·사건 수정이 이 시간 안에 반영
+_sub_lock = threading.Lock()
+
+# 따옴표 안의 말
+_QUOTE_MARK_RE = re.compile(r"[\"“”'‘’「」『』]\s*(.+?)\s*[\"“”'‘’「」『』]")
+# "~라고 했잖아 / 말했어 / 그랬어 / 하더라" 앞부분 (따옴표 없이 옮겨 말하기)
+_SAID_RE = re.compile(r"(.+?)\s*(?:이?라고|이?라구|이?래서|하고)\s*"
+                      r"(?:했|말했|말하|말한|그랬|그러|하더|하던|한\s|한거|물어|물었|소리|외쳤|외치)")
+
+
+def _jamo(text):
+    """한글을 자모로 풀고 공백·문장부호 제거 ("햇다"/"했다" 처럼 받침 하나 다른 오타도 대부분 겹침)"""
+    out = []
+    for ch in re.sub(r"[^가-힣a-zA-Z0-9]", "", text):
+        o = ord(ch) - 0xAC00
+        if 0 <= o < 11172:
+            out.append(chr(0x1100 + o // 588))
+            out.append(chr(0x1161 + (o % 588) // 28))
+            if o % 28:
+                out.append(chr(0x11A7 + o % 28))
+        else:
+            out.append(ch.lower())
+    return "".join(out)
+
+
+def _grams(text, n=3):
+    j = _jamo(text)
+    return {j[i:i + n] for i in range(len(j) - n + 1)}
+
+
+def _subtitle_lines(drama_id, kb_version):
+    """사건과 연결된 자막 대사 [{episode, speaker, text, grams, event_ids}] (TTL 캐시)"""
+    key = (drama_id, kb_version)
+    now = time.time()
+    with _sub_lock:
+        hit = _SUB_CACHE.get(key)
+        if hit and now - hit[0] < _SUB_TTL_S:
+            return hit[1]
+
+    # 청크 → 사건: 사건 메타데이터의 source_chunk_ids_json (반려된 사건 제외)
+    chunk_events = {}
+    data = S["col"].get(where={"$and": [{"drama_id": drama_id}, {"kb_version": kb_version}]},
+                        include=["metadatas"])
+    for eid, meta in zip(data["ids"], data["metadatas"]):
+        if meta.get("verification_status") == "REJECTED":
+            continue
+        try:
+            chunk_ids = json.loads(meta.get("source_chunk_ids_json") or "[]")
+        except ValueError:
+            chunk_ids = []
+        for cid in chunk_ids:
+            chunk_events.setdefault(cid, []).append(eid)
+
+    lines, seen = [], {}
+    for path in sorted((SUBTITLE_KB_DIR / kb_version / f"d{int(drama_id)}").glob("ep*/chunks.json")):
+        try:
+            chunks = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        for ch in chunks:
+            events = chunk_events.get(ch.get("id"))
+            if not events:
+                continue                       # 사건이 없는 장면의 대사는 스포 근거로 안 씀
+            episode = int((ch.get("metadata") or {}).get("episode_number") or 0)
+            for raw in str(ch.get("document") or "").split("\n"):
+                speaker, _, text = raw.partition(":")
+                if not text:
+                    speaker, text = "", raw
+                text = text.strip()
+                if _nospace_len(text) < QUOTE_MIN_CHARS:
+                    continue
+                k = (episode, text)
+                if k in seen:                  # 청크가 겹쳐서 같은 대사가 두 번 나옴 → 사건만 합침
+                    item = seen[k]
+                    item["event_ids"] = list(dict.fromkeys(item["event_ids"] + events))
+                    continue
+                item = {"episode": episode, "speaker": speaker.strip(), "text": text,
+                        "grams": _grams(text), "event_ids": list(events)}
+                seen[k] = item
+                lines.append(item)
+
+    with _sub_lock:
+        _SUB_CACHE[key] = (now, lines)
+    return lines
+
+
+def _quoted_parts(text):
+    """
+    명시적으로 옮겨 말한 부분
+      - "~라고 했잖아 / 말했어 / 한 거" 앞부분
+      - 따옴표 안의 말 + 따옴표 밖에 다른 말이 있을 때 ("'…'가 무슨 뜻이야?", "서윤하가 '…'")
+    따옴표로 대사만 감싼 메시지("\"…\"")는 대사만 친 것과 같게 봄 → 후보로만
+    """
+    parts = [m.group(1) for m in _SAID_RE.finditer(text)]
+    for m in _QUOTE_MARK_RE.finditer(text):
+        outside = text[:m.start()] + text[m.end():]
+        if _nospace_len(re.sub(r"[^가-힣a-zA-Z0-9]", "", outside)) >= 2:
+            parts.append(m.group(1))
+    return [p for p in parts if _nospace_len(p) >= QUOTE_MIN_CHARS]
+
+
+def _subtitle_hits(text, drama_id, kb_version, episodes, limit=3):
+    """
+    채팅과 비슷한 사건 장면 대사 (점수 높은 순).
+      explicit=True : "서윤하가 '…'라고 했잖아"처럼 옮겨 말함 → 인용으로 확정
+      explicit=False: 대사만 비슷함 → 후보로만 (Gemini 판단)
+    """
+    if not SUBTITLE_QUOTE or _nospace_len(text) < QUOTE_MIN_CHARS:
+        return []
+    try:
+        lines = _subtitle_lines(drama_id, kb_version)
+    except Exception as e:                     # 자막이 없거나 읽기 실패 → 대사 비교 없이 판정
+        print(f"[subtitle] load failed drama={drama_id}: {type(e).__name__}: {e}")
+        return []
+    if not lines:
+        return []
+    allowed = set(episodes)
+    explicit_parts = [_grams(p) for p in _quoted_parts(text)]
+    whole = _grams(text)
+    hits = []
+    for ln in lines:
+        if ln["episode"] not in allowed or not ln["grams"]:
+            continue
+        g = ln["grams"]
+        # 옮겨 말한 부분 안에 대사가 얼마나 들어 있나 (앞뒤 "근데 서윤하가", "라고 했잖아" 는 상관없음)
+        exp = max((len(q & g) / len(g) for q in explicit_parts if q), default=0.0)
+        # 대사만 친 경우: 서로 얼마나 겹치나 (Dice)
+        plain = 2 * len(whole & g) / (len(whole) + len(g)) if whole else 0.0
+        if exp >= QUOTE_EXPLICIT_MIN:
+            hits.append({**ln, "score": round(exp, 2), "explicit": True})
+        elif plain >= QUOTE_PLAIN_MIN:
+            hits.append({**ln, "score": round(plain, 2), "explicit": False})
+    hits.sort(key=lambda h: (h["explicit"], h["score"]), reverse=True)
+    return [{k: v for k, v in h.items() if k != "grams"} for h in hits[:limit]]
 
 # ---------------------------------------------------------------- 대화 맥락
 _LAUGH_ONLY_RE = re.compile(r"^[ㅋㅎㅠㅜㄷ\s!?.~^;]+$")   # 웃음·울음만 → 맥락이 있어도 정보 없음
@@ -719,6 +875,10 @@ def judge(req: JudgeRequest):
     t_all = time.perf_counter()
     episodes = sorted(set(req.episodes))
     ctx = _context_info(req)
+    # 자막 대사 비교 (나눠 보낸 문장이면 이어 붙인 문장 기준)
+    t = time.perf_counter()
+    quote_hits = _subtitle_hits(ctx["joined"] or req.message, req.drama_id, req.kb_version, episodes)
+    tm["subtitle"] = time.perf_counter() - t
     args = SimpleNamespace(
         message=req.message, drama_id=req.drama_id, kb_version=req.kb_version,
         episodes=episodes, retrieval=req.retrieval, top_k=req.top_k,
@@ -742,6 +902,9 @@ def judge(req: JudgeRequest):
         # "ㅇㅇ", "민재현ㅋ", "남겼었어" 처럼 혼자는 일반 대화지만 직전 질문의 답·나눠 보낸 문장의 끝이면 확인
         if pf.get("decision") == "SKIP" and _context_may_matter(req.message, ctx):
             pf = {**pf, "decision": "CHECK", "stage": "context", "skipped_stage": pf.get("stage")}
+        # 사건 장면의 대사와 비슷하면 Gemini 로 확인
+        if pf.get("decision") == "SKIP" and quote_hits:
+            pf = {**pf, "decision": "CHECK", "stage": "subtitle", "skipped_stage": pf.get("stage")}
         pf.update(mode=mode, best_sim=best_sim, best_event_id=best_id)
         tm["prefilter"] = time.perf_counter() - t
 
@@ -778,7 +941,20 @@ def judge(req: JudgeRequest):
     tm["retrieval"] = time.perf_counter() - t
     if chunk_count:
         tm["retrieval_chunks"] = chunk_count
-
+    if quote_hits:
+        # 대사 장면의 사건이 검색에서 빠졌으면 앞쪽에 추가 (임베딩 검색은 요약문이라 대사 인용을 잘 못 찾음)
+        have = {c["event_id"] for c in candidates}
+        want = [i for h in quote_hits for i in h["event_ids"] if i not in have]
+        if want:
+            got = S["col"].get(ids=list(dict.fromkeys(want)), include=["documents", "metadatas"])
+            add = [{"event_id": i, "description": d, **m}
+                   for i, d, m in zip(got["ids"], got["documents"], got["metadatas"])
+                   if m.get("verification_status") != "REJECTED" and int(m.get("source_episode") or 0) in episodes]
+            candidates = (add + candidates)[:MAX_CANDIDATES]
+        have = {c["event_id"] for c in candidates}
+        for h in quote_hits:
+            h["event_ids"] = [i for i in h["event_ids"] if i in have]
+        quote_hits = [h for h in quote_hits if h["event_ids"]]    
     # 1-1) 이 범위에 등록된 사건이 하나도 없음 → 비교 대상이 없으므로 NO_MATCH (Spring 은 보류 처리)
     if not candidates:
         tm["total"] = time.perf_counter() - t_all
@@ -812,10 +988,17 @@ def judge(req: JudgeRequest):
 
     # 2) 판별 캐시 키 (프롬프트·스키마가 키에 들어가므로 프롬프트가 바뀌면 자동으로 새로 판정)
     has_ctx = bool(ctx["payload"])
-    system, schema = _prompt_for(req.reason_mode, with_context=has_ctx)
+    system, schema = _prompt_for(req.reason_mode, with_context=has_ctx, with_quotes=bool(quote_hits))
     gemini_extra = None
+    if quote_hits:
+        real_to_alias = {v: k for k, v in alias_map.items()}
+        gemini_extra = {"subtitle_quotes": [
+            {"episode": h["episode"], "speaker": h["speaker"], "line": h["text"],
+             "event_ids": [real_to_alias[i] for i in h["event_ids"] if i in real_to_alias]}
+            for h in quote_hits]}
     if has_ctx:
-        gemini_extra = {"context": ctx["payload"]}
+        gemini_extra = gemini_extra or {}
+        gemini_extra["context"] = ctx["payload"]
         if ctx["joined"]:
             gemini_extra["joined_message"] = ctx["joined"]
         if ctx["question"]:
@@ -920,7 +1103,20 @@ def judge(req: JudgeRequest):
         matched_list = [id_map[i] for i in dict.fromkeys(ids) if i in id_map]
         if matched_list:
             matched = max(matched_list, key=base.effective_episode)
-
+    # 대사를 옮겨 말함 ("서윤하가 '…'라고 했잖아", 따옴표, 질문 속 인용 포함)
+    #  → Gemini 판단과 상관없이 그 대사 장면의 사건으로 가림. 회차 = 대사가 나온 회차
+    explicit_hits = [h for h in quote_hits if h["explicit"] and any(i in id_map for i in h["event_ids"])]
+    quote_forced = False
+    if error is None and explicit_hits:
+        known = {e["event_id"] for e in matched_list}
+        new = [id_map[i] for h in explicit_hits for i in h["event_ids"] if i in id_map and i not in known]
+        new = list({e["event_id"]: e for e in new}.values())
+        if verdict != "MATCH" or new:
+            quote_forced = verdict != "MATCH"
+            matched_list = matched_list + new
+            verdict = "MATCH"
+            matched = max(matched_list, key=base.effective_episode)
+            reveals_plot = True
     # 추측·질문인데 사건 내용과 맞는 경우 (Spring 이 작성자 시청 진도와 비교: 이미 본 회차면 스포로 처리)
     matched_ids = {e["event_id"] for e in matched_list}
     guess_list = [] if error is not None else [
@@ -957,6 +1153,12 @@ def judge(req: JudgeRequest):
         "match_cache": cache_status,
         "prefilter": pf,       # shadow 모드: 'SKIP이었을 텐데 실제 판정은?'을 비교하는 기록
         "prompt_version": "v2",      # 응답 형식 유지용 (v1 프롬프트는 삭제됨)
+        # 자막 대사 비교 결과 (관리자 확인용)
+        "subtitle_quotes": [{k: h[k] for k in ("episode", "speaker", "text", "score", "explicit")}
+                            for h in quote_hits] or None,
+        "quote_forced": quote_forced,
+        # 옮겨 말한 대사의 회차: Spring 은 작성자 진도와 상관없이 이 회차보다 덜 본 사람에게 가림
+        "quoted_line_episodes": sorted({h["episode"] for h in explicit_hits}) if verdict == "MATCH" else [],        
         # 대화 맥락 사용 기록 (관리자 확인용)
         "context_used": {"lines": len(ctx["payload"]), "joined": ctx["joined"],
                          "question": ctx["question"]} if has_ctx else None,
