@@ -268,6 +268,8 @@ Fill the fields in this order.
    Presupposition: when a question or guess takes a story fact as already known
    ("강도현이 범인인 거 알았어?", "윤하는 왜 문을 열어줬을까?", "재현이 찾아온 다음에 어떻게 됐더라?"),
    that known part is stated -> stance = "fact".
+   Asking whether others saw or know a scene states that scene: "~하는 거 보셨나요?", "~한 거 봄?",
+   "~한 거 아시나요?", "~했던 거 기억나?" ("정우진이 녹음해 둔 거 보셨나요?" = 정우진이 녹음해 둠) -> "fact".
    Mixed messages: if any part states a story fact, stance = "fact".
 
 2. shared_fact - one short Korean phrase with the core fact (who / did what / to whom / outcome) that
@@ -554,6 +556,10 @@ _LAUGH_ONLY_RE = re.compile(r"^[ㅋㅎㅠㅜㄷ\s!?.~^;]+$")   # 웃음·울음�
 _ASK_RE = re.compile(r"[?？]|(누가|누구|뭐|뭔|뭘|무슨|언제|어디|어떻게|몇)")
 # 다른 사람의 짧은 맞장구("ㅇㅇ", "맞음ㅋ", "ㄴㄴ") → 질문을 찾을 때 건너뜀 (같은 질문에 여러 명이 답하는 경우)
 _SHORT_REPLY_MAX = 4
+# "ㄹㅇ?", "진짜?", "정말?" 처럼 짧게 되묻는 질문 → 그 앞 말이 실제 질문 내용
+_SHORT_ASK_MAX = 5
+# 메시지가 직접 말한 회차 ("3화에서도", "1화에서 말했듯이"). "몇 화" 는 제외
+_EPISODE_MENTION_RE = re.compile(r"(?<![0-9몇])(\d{1,2})\s*화")
 
 
 def _nospace_len(t):
@@ -606,6 +612,11 @@ def _context_info(req):
             break             # 질문이 아닌 일반 문장 → 그 앞 질문은 이미 지나간 대화
     if qi is not None:
         info["question"] = lines[qi].text.strip()
+        # "ㄹㅇ?", "진짜?" 는 바로 앞 말을 되묻는 것 → 앞 말까지 묶어서 질문으로 봄
+        #  ("녹음파일 찍어둠" → "ㄹㅇ?" → "ㅇㅇ" 에서 "ㅇㅇ" 은 녹음했다는 사실의 확인)
+        if qi > 0 and _nospace_len(info["question"]) <= _SHORT_ASK_MAX:
+            qi -= 1
+            info["question"] = f'{lines[qi].text.strip()} → {info["question"]}'
 
     # Gemini 에 보낼 맥락: 오래된 다른 주제가 섞이지 않게 필요한 줄만
     #  질문이 있으면 그 질문부터 / 나눠 보낸 문장이면 그 조각들 / 그 외 직전 3줄
@@ -1124,6 +1135,13 @@ def judge(req: JudgeRequest):
 
     # MATCH 이외(NO_MATCH/UNCERTAIN/ERROR)는 회차를 정할 수 없으므로 fail-closed
     required_episode = base.effective_episode(matched) if matched else None
+    matched_episodes = sorted({base.effective_episode(e) for e in matched_list})
+    # 사실을 말하면서 회차를 직접 밝힌 경우 ("1화에서 말했듯이 3화에서도 ~함")
+    #  사건은 1화 것이어도 "3화에도 나온다"는 정보가 드러나므로 말한 회차 중 가장 늦은 회차까지 가림
+    mentioned = sorted({int(m) for m in _EPISODE_MENTION_RE.findall(judge_text) if int(m) in episodes})
+    if verdict == "MATCH" and required_episode is not None and mentioned and mentioned[-1] > required_episode:
+        required_episode = mentioned[-1]
+        matched_episodes = sorted(set(matched_episodes) | {required_episode})
     # 일치한 사건이 모두 검수된 경우에만 검증된 기준. 하나라도 미검수면 보수적으로 UNVERIFIED
     all_verified = bool(matched_list) and all(base.is_verified(e) for e in matched_list)
     episode_basis = base.VERIFIED_BASIS if all_verified else base.UNVERIFIED_BASIS
@@ -1132,7 +1150,8 @@ def judge(req: JudgeRequest):
         "analysis_verdict": verdict,                  # MATCH / NO_MATCH / UNCERTAIN / ERROR
         "matched_event_id": matched["event_id"] if matched else None,   # 가장 늦은 회차의 사건
         "matched_event_ids": [e["event_id"] for e in matched_list],      # 일치한 사건 전부
-        "matched_episodes": sorted({base.effective_episode(e) for e in matched_list}),
+        "matched_episodes": matched_episodes,
+        "mentioned_episodes": mentioned or None,     # 메시지가 직접 말한 회차 (관리자 확인용)
         "required_episode_number": required_episode,  # chat_messages.required_episode_number
         "episode_basis": episode_basis,
         "needs_review": matched is None,              # True면 Spring은 HIDDEN/대기 처리
