@@ -25,3 +25,14 @@ copy .env.example .env   # 값 채우기
 ```
 
 `chroma_data/`, `data/`, `.env` 는 커밋하지 않는다.
+
+## 테스트
+
+Gemini·ChromaDB·임베딩 모델은 가짜 객체로 대신하므로 API 키나 서버 없이 실행된다.
+
+```bash
+pip install python-dotenv
+python -m unittest discover -s tests -v
+```
+
+GitHub Actions 가 PR 과 main push 때 위 테스트를 실행하고, **통과해야만 EC2 배포가 진행**된다.

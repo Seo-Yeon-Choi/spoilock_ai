@@ -1,4 +1,4 @@
-name: Deploy AI server
+name: AI server CI/CD
 
 on:
   push:
@@ -8,17 +8,47 @@ on:
       - "docs/**"
       - "archive/**"
       - "**.md"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "chat_test/**"
+      - "docs/**"
+      - "archive/**"
+      - "**.md"
   workflow_dispatch:
 
 concurrency:
-  group: deploy-ai
+  group: ai-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 단위 테스트는 Gemini·ChromaDB·임베딩 모델을 가짜 객체로 대신하므로 가벼운 의존성만 설치
+      - name: Install test dependencies
+        run: pip install python-dotenv
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
   deploy:
+    name: Deploy to EC2 (SSM)
+    needs: test
+    # 배포는 main 반영(push)·수동 실행 때만. PR 에서는 테스트만 실행
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS credentials
